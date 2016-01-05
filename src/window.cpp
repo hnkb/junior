@@ -100,6 +100,13 @@ void window::draw_line(const int x1, const int y1, const int x2, const int y2)
 	LineTo(hdc, x2, y2);
 }
 
+void window::draw_circle(const int x, const int y, const int radius)
+{
+	if (!_hwnd) return;
+	auto hdc = GetDC(_hwnd);
+	Ellipse(hdc, x - radius, y - radius, x + radius, y + radius);
+}
+
 void window::write(const wchar_t* text, const int x, const int y)
 {
 	if (!_hwnd) return;
