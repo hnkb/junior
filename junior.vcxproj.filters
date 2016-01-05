@@ -21,6 +21,9 @@
     <ClCompile Include="src\window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\event.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitattributes" />
@@ -31,6 +34,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="inc\junior">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\event.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
