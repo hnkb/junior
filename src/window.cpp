@@ -54,3 +54,17 @@ LRESULT window::_proc(UINT msg, WPARAM wp, LPARAM lp)
 	}
 	return DefWindowProcW(_hwnd, msg, wp, lp);
 }
+
+
+void window::draw_line(const int x1, const int y1, const int x2, const int y2)
+{
+	auto hdc = GetDC(_hwnd);
+	MoveToEx(hdc, x1, y1, nullptr);
+	LineTo(hdc, x2, y2);
+}
+
+void window::write(const wchar_t* text, const int x, const int y)
+{
+	auto hdc = GetDC(_hwnd);
+	TextOutW(hdc, x, y, text, lstrlenW(text));
+}
