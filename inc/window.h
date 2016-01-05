@@ -1,6 +1,5 @@
 #pragma once
 
-#include <string>
 #include <Windows.h>
 
 
@@ -16,10 +15,9 @@ namespace junior
 		void write(const wchar_t* text, const int x, const int y);
 
 	private:
-		std::wstring _title;
 		HWND _hwnd;
 
 		LRESULT _proc(UINT msg, WPARAM wp, LPARAM lp);
-		void _create();
+		void _create(const wchar_t* title);
 	};
 }

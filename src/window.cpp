@@ -4,9 +4,9 @@
 using namespace junior;
 
 
-window::window(const wchar_t* title) : _hwnd(nullptr), _title(title)
+window::window(const wchar_t* title) : _hwnd(nullptr)
 {
-	_create();
+	_create(title);
 }
 
 window::~window()
@@ -15,7 +15,7 @@ window::~window()
 }
 
 
-void window::_create()
+void window::_create(const wchar_t* title)
 {
 	WNDCLASSEXW wcex = { 0 };
 	wcex.cbSize = sizeof(WNDCLASSEX);
@@ -34,7 +34,7 @@ void window::_create()
 	RegisterClassExW(&wcex);
 
 
-	_hwnd = CreateWindowExW(0, wcex.lpszClassName, _title.c_str(), WS_OVERLAPPEDWINDOW,
+	_hwnd = CreateWindowExW(0, wcex.lpszClassName, title, WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, GetModuleHandleW(nullptr), nullptr);
 
 
