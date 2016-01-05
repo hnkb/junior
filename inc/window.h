@@ -9,6 +9,10 @@ namespace junior
 	{
 	public:
 		window(const wchar_t* title);
+		window(const window& other);
+		window(window&& other);
+		window& operator=(const window& other);
+		window& operator=(window&& other);
 		~window();
 
 		void draw_line(const int x1, const int y1, const int x2, const int y2);

@@ -1,5 +1,6 @@
 
 #include "window.h"
+#include <algorithm>
 
 using namespace junior;
 
@@ -9,9 +10,42 @@ window::window(const wchar_t* title) : _hwnd(nullptr)
 	_create(title);
 }
 
+window::window(const window& other) : _hwnd(nullptr)
+{
+	*this = other;
+}
+
+window::window(window&& other) : _hwnd(nullptr)
+{
+	*this = std::move(other);
+}
+
+window& window::operator=(const window& other)
+{
+	if (this != &other)
+	{
+		wchar_t buffer[1024];
+		GetWindowTextW(other._hwnd, buffer, 1023);
+		_create(buffer);
+	}
+	return *this;
+}
+
+window& window::operator=(window&& other)
+{
+	if (this != &other)
+	{
+		_hwnd = other._hwnd;
+		other._hwnd = nullptr;
+
+		if (_hwnd) SetWindowLongPtrW(_hwnd, GWLP_USERDATA, (LONG_PTR)this);
+	}
+	return *this;
+}
+
 window::~window()
 {
-	DestroyWindow(_hwnd);
+	if (_hwnd) DestroyWindow(_hwnd);
 }
 
 
@@ -60,6 +94,7 @@ LRESULT window::_proc(UINT msg, WPARAM wp, LPARAM lp)
 
 void window::draw_line(const int x1, const int y1, const int x2, const int y2)
 {
+	if (!_hwnd) return;
 	auto hdc = GetDC(_hwnd);
 	MoveToEx(hdc, x1, y1, nullptr);
 	LineTo(hdc, x2, y2);
@@ -67,6 +102,7 @@ void window::draw_line(const int x1, const int y1, const int x2, const int y2)
 
 void window::write(const wchar_t* text, const int x, const int y)
 {
+	if (!_hwnd) return;
 	auto hdc = GetDC(_hwnd);
 	TextOutW(hdc, x, y, text, lstrlenW(text));
 }
