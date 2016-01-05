@@ -30,5 +30,8 @@
     <ClInclude Include="inc\window.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="inc\junior">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

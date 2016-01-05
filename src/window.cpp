@@ -1,6 +1,8 @@
 
 #include "window.h"
 
+using namespace junior;
+
 
 window::window(const wchar_t* title) : _hwnd(nullptr), _title(title)
 {

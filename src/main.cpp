@@ -1,10 +1,11 @@
 
 #include <Windows.h>
-#include "window.h"
+#include "junior"
+
 
 int __stdcall wWinMain(HINSTANCE, HINSTANCE, LPWSTR, int)
 {
-	window main(L"Junior test");
+	junior::window main(L"Junior test");
 	main.draw_line(10, 20, 100, 200);
 	main.write(L"magmag", 50, 100);
 
