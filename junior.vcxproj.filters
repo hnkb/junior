@@ -33,16 +33,16 @@
     <None Include=".gitignore" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="inc\window.h">
+    <ClInclude Include="include\event.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="inc\junior">
+    <ClInclude Include="include\junior">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="inc\event.h">
+    <ClInclude Include="include\junior-simple.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="inc\junior-simple.h">
+    <ClInclude Include="include\window.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
