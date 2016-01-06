@@ -21,6 +21,7 @@ namespace junior
 	private:
 		long* _wndproc(const unsigned int msg, const int* wParam, const long* lParam);
 		void _create(const wchar_t* title);
+		static int _count;
 
 		void* _handle;
 		int _cursor_y = 10;

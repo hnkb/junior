@@ -36,6 +36,9 @@ namespace junior
 
 		event _event_from_msg(MSG msg)
 		{
+			if (msg.message == WM_USER + 1)
+				return event(event_type::window_destroy, (window*)msg.lParam, mouse_event(), keyboard_event());
+
 			static std::map<UINT, event_type> mapped_events({
 				{ WM_QUIT, event_type::quit },
 				{ WM_KEYDOWN, event_type::key_down }, { WM_KEYUP, event_type::key_up },

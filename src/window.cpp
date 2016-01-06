@@ -50,6 +50,8 @@ namespace junior
 	}
 
 
+	int window::_count = 0;
+
 	void window::_create(const wchar_t* title)
 	{
 		WNDCLASSEXW wcex = { 0 };
@@ -75,6 +77,7 @@ namespace junior
 
 		if (_handle)
 		{
+			_count++;
 			SetWindowLongPtrW((HWND)_handle, GWLP_USERDATA, (LONG_PTR)this);
 			ShowWindow((HWND)_handle, SW_SHOWDEFAULT);
 			UpdateWindow((HWND)_handle);
@@ -86,7 +89,8 @@ namespace junior
 		switch (msg)
 		{
 		case WM_DESTROY:
-			PostQuitMessage(0);
+			PostMessageW(nullptr, WM_USER + 1, 0, (LPARAM)this);
+			if (!--_count) PostAppMessageW(nullptr, WM_QUIT, 0, 0);// PostQuitMessage(0);
 			return 0;
 		}
 		return (long*)DefWindowProcW((HWND)_handle, msg, (WPARAM)wParam, (LPARAM)lParam);

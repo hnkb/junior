@@ -9,6 +9,7 @@ namespace junior
 	{
 		invalid,
 		quit,
+		window_destroy,
 		key_down, key_up,
 		mouse_move, mouse_wheel,
 		mouse_lbutton_down, mouse_lbutton_up,
