@@ -1,5 +1,6 @@
 
 #include "event.h"
+#include "../win32/window_engine.h"
 #include <map>
 #include <Windows.h>
 #include <windowsx.h>
@@ -49,7 +50,7 @@ namespace junior
 			});
 
 			return event(mapped_events.count(msg.message) ? mapped_events.at(msg.message) : event_type::invalid,
-				(window*)GetWindowLongPtrW(msg.hwnd, GWLP_USERDATA),
+				_win32::window_engine::get_owner(msg.hwnd),
 				mouse_event(_mouse_event_from_msg(msg)), keyboard_event(_keyboard_event_from_msg(msg)));
 		}
 	}

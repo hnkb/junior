@@ -8,6 +8,7 @@ using namespace junior;
 int __stdcall wWinMain(HINSTANCE, HINSTANCE, LPWSTR, int)
 {
 	window a(L"window 1"), b(L"window 2");
+	window c = a;
 
 	while (auto e = wait_for_event())
 	{
@@ -16,10 +17,9 @@ int __stdcall wWinMain(HINSTANCE, HINSTANCE, LPWSTR, int)
 
 		if (e == event_type::window_destroy)
 		{
-			MessageBox(0, L"Window closed!", 0, 0);
 			if (e.window == &a)
 				b.write(L"window 1 closed!");
-			else
+			else if (e.window == &b)
 				a.write(L"window 2 closed!");
 		}
 	}

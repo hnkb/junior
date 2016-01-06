@@ -22,6 +22,9 @@
     <Filter Include="Header Files\core">
       <UniqueIdentifier>{4ce51e3d-4b1c-4b9d-b42e-118aa911021a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\win32">
+      <UniqueIdentifier>{75055bbd-1ccd-470b-ba2b-91b29b8d4c40}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\core\event.cpp">
@@ -33,6 +36,9 @@
     <ClCompile Include="..\..\..\src\core\window.cpp">
       <Filter>Source Files\core</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\win32\window_engine.cpp">
+      <Filter>Source Files\win32</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\include\event.h">
@@ -43,6 +49,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\include\window.h">
       <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\win32\window_engine.h">
+      <Filter>Header Files\win32</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

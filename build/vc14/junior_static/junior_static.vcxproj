@@ -22,11 +22,13 @@
     <ClCompile Include="..\..\..\src\core\event.cpp" />
     <ClCompile Include="..\..\..\src\core\junior-simple.cpp" />
     <ClCompile Include="..\..\..\src\core\window.cpp" />
+    <ClCompile Include="..\..\..\src\win32\window_engine.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\include\event.h" />
     <ClInclude Include="..\..\..\include\junior-simple.h" />
     <ClInclude Include="..\..\..\include\window.h" />
+    <ClInclude Include="..\..\..\src\win32\window_engine.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\include\junior" />
