@@ -1,7 +1,5 @@
 #pragma once
 
-#include <Windows.h>
-
 
 namespace junior
 {
@@ -20,9 +18,9 @@ namespace junior
 		void write(const wchar_t* text, const int x, const int y);
 
 	private:
-		HWND _hwnd;
-
-		LRESULT _proc(UINT msg, WPARAM wp, LPARAM lp);
+		long* _wndproc(const unsigned int msg, const int* wParam, const long* lParam);
 		void _create(const wchar_t* title);
+
+		void* _handle;
 	};
 }

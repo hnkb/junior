@@ -1,115 +1,117 @@
 
 #include "window.h"
 #include <algorithm>
+#include <Windows.h>
 
-using namespace junior;
 
-
-window::window(const wchar_t* title) : _hwnd(nullptr)
+namespace junior
 {
-	_create(title);
-}
-
-window::window(const window& other) : _hwnd(nullptr)
-{
-	*this = other;
-}
-
-window::window(window&& other) : _hwnd(nullptr)
-{
-	*this = std::move(other);
-}
-
-window& window::operator=(const window& other)
-{
-	if (this != &other)
+	window::window(const wchar_t* title) : _handle(nullptr)
 	{
-		wchar_t buffer[1024];
-		GetWindowTextW(other._hwnd, buffer, 1023);
-		_create(buffer);
+		_create(title);
 	}
-	return *this;
-}
 
-window& window::operator=(window&& other)
-{
-	if (this != &other)
+	window::window(const window& other) : _handle(nullptr)
 	{
-		_hwnd = other._hwnd;
-		other._hwnd = nullptr;
-
-		if (_hwnd) SetWindowLongPtrW(_hwnd, GWLP_USERDATA, (LONG_PTR)this);
+		*this = other;
 	}
-	return *this;
-}
 
-window::~window()
-{
-	if (_hwnd) DestroyWindow(_hwnd);
-}
-
-
-void window::_create(const wchar_t* title)
-{
-	WNDCLASSEXW wcex = { 0 };
-	wcex.cbSize = sizeof(WNDCLASSEX);
-
-	wcex.style = CS_HREDRAW | CS_VREDRAW;
-	wcex.hInstance = GetModuleHandleW(nullptr);
-	wcex.hCursor = LoadCursorW(nullptr, IDC_ARROW);
-	wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-	wcex.lpszClassName = L"junior_window";
-
-	wcex.lpfnWndProc = [](HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
-		auto target = (window*)GetWindowLongPtrW(hwnd, GWLP_USERDATA);
-		return target ? target->_proc(msg, wp, lp) : DefWindowProcW(hwnd, msg, wp, lp);
-	};
-
-	RegisterClassExW(&wcex);
-
-
-	_hwnd = CreateWindowExW(0, wcex.lpszClassName, title, WS_OVERLAPPEDWINDOW,
-		CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, GetModuleHandleW(nullptr), nullptr);
-
-
-	if (_hwnd)
+	window::window(window&& other) : _handle(nullptr)
 	{
-		SetWindowLongPtrW(_hwnd, GWLP_USERDATA, (LONG_PTR)this);
-		ShowWindow(_hwnd, SW_SHOWDEFAULT);
-		UpdateWindow(_hwnd);
+		*this = std::move(other);
 	}
-}
 
-LRESULT window::_proc(UINT msg, WPARAM wp, LPARAM lp)
-{
-	switch (msg)
+	window& window::operator=(const window& other)
 	{
-	case WM_DESTROY:
-		PostQuitMessage(0);
-		return 0;
+		if (this != &other)
+		{
+			wchar_t buffer[1024];
+			GetWindowTextW((HWND)other._handle, buffer, 1023);
+			_create(buffer);
+		}
+		return *this;
 	}
-	return DefWindowProcW(_hwnd, msg, wp, lp);
-}
+
+	window& window::operator=(window&& other)
+	{
+		if (this != &other)
+		{
+			_handle = other._handle;
+			other._handle = nullptr;
+
+			if (_handle) SetWindowLongPtrW((HWND)_handle, GWLP_USERDATA, (LONG_PTR)this);
+		}
+		return *this;
+	}
+
+	window::~window()
+	{
+		if (_handle) DestroyWindow((HWND)_handle);
+	}
 
 
-void window::draw_line(const int x1, const int y1, const int x2, const int y2)
-{
-	if (!_hwnd) return;
-	auto hdc = GetDC(_hwnd);
-	MoveToEx(hdc, x1, y1, nullptr);
-	LineTo(hdc, x2, y2);
-}
+	void window::_create(const wchar_t* title)
+	{
+		WNDCLASSEXW wcex = { 0 };
+		wcex.cbSize = sizeof(WNDCLASSEX);
 
-void window::draw_circle(const int x, const int y, const int radius)
-{
-	if (!_hwnd) return;
-	auto hdc = GetDC(_hwnd);
-	Ellipse(hdc, x - radius, y - radius, x + radius, y + radius);
-}
+		wcex.style = CS_HREDRAW | CS_VREDRAW;
+		wcex.hInstance = GetModuleHandleW(nullptr);
+		wcex.hCursor = LoadCursorW(nullptr, IDC_ARROW);
+		wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+		wcex.lpszClassName = L"junior_window";
 
-void window::write(const wchar_t* text, const int x, const int y)
-{
-	if (!_hwnd) return;
-	auto hdc = GetDC(_hwnd);
-	TextOutW(hdc, x, y, text, lstrlenW(text));
+		wcex.lpfnWndProc = [](HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
+			auto target = (window*)GetWindowLongPtrW(hwnd, GWLP_USERDATA);
+			return target ? (LPARAM)target->_wndproc(msg, (int*)wp, (long*)lp) : DefWindowProcW(hwnd, msg, wp, lp);
+		};
+
+		RegisterClassExW(&wcex);
+
+
+		_handle = CreateWindowExW(0, wcex.lpszClassName, title, WS_OVERLAPPEDWINDOW,
+			CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, GetModuleHandleW(nullptr), nullptr);
+
+
+		if (_handle)
+		{
+			SetWindowLongPtrW((HWND)_handle, GWLP_USERDATA, (LONG_PTR)this);
+			ShowWindow((HWND)_handle, SW_SHOWDEFAULT);
+			UpdateWindow((HWND)_handle);
+		}
+	}
+
+	long* window::_wndproc(const unsigned int msg, const int* wParam, const long* lParam)
+	{
+		switch (msg)
+		{
+		case WM_DESTROY:
+			PostQuitMessage(0);
+			return 0;
+		}
+		return (long*)DefWindowProcW((HWND)_handle, msg, (WPARAM)wParam, (LPARAM)lParam);
+	}
+
+
+	void window::draw_line(const int x1, const int y1, const int x2, const int y2)
+	{
+		if (!_handle) return;
+		auto hdc = GetDC((HWND)_handle);
+		MoveToEx(hdc, x1, y1, nullptr);
+		LineTo(hdc, x2, y2);
+	}
+
+	void window::draw_circle(const int x, const int y, const int radius)
+	{
+		if (!_handle) return;
+		auto hdc = GetDC((HWND)_handle);
+		Ellipse(hdc, x - radius, y - radius, x + radius, y + radius);
+	}
+
+	void window::write(const wchar_t* text, const int x, const int y)
+	{
+		if (!_handle) return;
+		auto hdc = GetDC((HWND)_handle);
+		TextOutW(hdc, x, y, text, lstrlenW(text));
+	}
 }
