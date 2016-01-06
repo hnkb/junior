@@ -1,5 +1,4 @@
 
-#include <Windows.h>
 #include "junior"
 
 
@@ -22,3 +21,18 @@ int __stdcall wWinMain(HINSTANCE, HINSTANCE, LPWSTR, int)
 
 	return 0;
 }
+
+//#include "junior-simple.h"
+//
+//
+//int __stdcall wWinMain(HINSTANCE, HINSTANCE, LPWSTR, int)
+//{
+//	create_window(L"Junior simple test");
+//
+//	write(L"Hello Junior!", 10, 10);
+//	draw_circle(500, 300, 40);
+//
+//	wait_for_event();
+//
+//	return 0;
+//}

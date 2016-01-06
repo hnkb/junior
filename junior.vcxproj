@@ -163,6 +163,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\event.cpp" />
+    <ClCompile Include="src\junior-simple.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\window.cpp" />
   </ItemGroup>
@@ -173,6 +174,7 @@
   <ItemGroup>
     <ClInclude Include="inc\event.h" />
     <ClInclude Include="inc\junior" />
+    <ClInclude Include="inc\junior-simple.h" />
     <ClInclude Include="inc\window.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
