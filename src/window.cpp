@@ -114,4 +114,11 @@ namespace junior
 		auto hdc = GetDC((HWND)_handle);
 		TextOutW(hdc, x, y, text, lstrlenW(text));
 	}
+
+	void window::write(const wchar_t* text)
+	{
+		if (!_handle) return;
+		auto hdc = GetDC((HWND)_handle);
+		TextOutW(hdc, 10, _cursor_y += 20, text, lstrlenW(text));
+	}
 }
