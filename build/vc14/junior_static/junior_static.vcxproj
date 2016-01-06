@@ -19,9 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\src\event.cpp" />
-    <ClCompile Include="..\..\..\src\junior-simple.cpp" />
-    <ClCompile Include="..\..\..\src\window.cpp" />
+    <ClCompile Include="..\..\..\src\core\event.cpp" />
+    <ClCompile Include="..\..\..\src\core\junior-simple.cpp" />
+    <ClCompile Include="..\..\..\src\core\window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\include\event.h" />
