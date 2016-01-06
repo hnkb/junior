@@ -10,7 +10,7 @@ int __stdcall wWinMain(HINSTANCE, HINSTANCE, LPWSTR, int)
 	{
 		if (e == EVENT_MOUSEMOVE && e.mouse.is_button_pressed.left)
 		{
-			e.target->draw_circle(e.mouse.x, e.mouse.y, 2);
+			e.window->draw_circle(e.mouse.x, e.mouse.y, 2);
 		}
 
 		if (e == EVENT_KEYDOWN && e.key.code == VK_ESCAPE)
