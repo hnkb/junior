@@ -90,7 +90,7 @@ namespace junior
 		{
 		case WM_DESTROY:
 			PostMessageW(nullptr, WM_USER + 1, 0, (LPARAM)this);
-			if (!--_count) PostAppMessageW(nullptr, WM_QUIT, 0, 0);// PostQuitMessage(0);
+			if (!--_count) PostQuitMessage(0);
 			return 0;
 		}
 		return (long*)DefWindowProcW((HWND)_handle, msg, (WPARAM)wParam, (LPARAM)lParam);
