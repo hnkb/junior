@@ -5,11 +5,14 @@
 
 namespace junior
 {
-#define EVENT_QUIT 1
-#define EVENT_KEYDOWN 2
-#define EVENT_LBUTTONDOWN 3
-#define EVENT_MOUSEMOVE 4
-
+	enum class event_type : int
+	{
+		invalid,
+		quit,
+		key_down, key_up,
+		mouse_move,
+		mouse_lbutton_down
+	};
 
 	struct mouse_event
 	{
@@ -49,15 +52,15 @@ namespace junior
 	struct event
 	{
 	public:
-		event() : type(0) {}
-		event(const int event_type) : type(event_type) {}
-		event(const int event_type, window* event_window, const mouse_event& event_mouse, const keyboard_event& event_key)
+		event() : type(event_type::invalid) {}
+		event(const event_type event_type) : type(event_type) {}
+		event(const event_type event_type, window* event_window, const mouse_event& event_mouse, const keyboard_event& event_key)
 			: type(event_type), window(event_window), mouse(event_mouse), key(event_key) {}
 
-		inline operator bool() const { return type && type != EVENT_QUIT; }
-		inline bool operator==(const int val) const { return type == val; }
+		inline operator bool() const { return type != event_type::invalid && type != event_type::quit; }
+		inline bool operator==(const event_type val) const { return type == val; }
 
-		const int type;
+		const event_type type;
 		window* window;
 		const mouse_event mouse;
 		const keyboard_event key;

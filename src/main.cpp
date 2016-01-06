@@ -9,12 +9,12 @@ int __stdcall wWinMain(HINSTANCE, HINSTANCE, LPWSTR, int)
 
 	while (auto e = junior::wait_for_event())
 	{
-		if (e == EVENT_MOUSEMOVE && e.mouse.is_button_pressed.left)
+		if (e == junior::event_type::mouse_move && e.mouse.is_button_pressed.left)
 		{
 			e.window->draw_circle(e.mouse.x, e.mouse.y, 2);
 		}
 
-		if (e == EVENT_KEYDOWN && e.key.code == VK_ESCAPE)
+		if (e == junior::event_type::key_down && e.key.code == VK_ESCAPE)
 		{
 			break;
 		}

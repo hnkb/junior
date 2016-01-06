@@ -1,5 +1,6 @@
 
 #include "event.h"
+#include <map>
 #include <Windows.h>
 
 
@@ -32,26 +33,16 @@ namespace junior
 
 		event _event_from_msg(MSG msg)
 		{
-			auto wnd = (window*)GetWindowLongPtrW(msg.hwnd, GWLP_USERDATA);
+			static std::map<UINT, event_type> mapped_events({
+				{ WM_QUIT, event_type::quit },
+				{ WM_KEYDOWN, event_type::key_down }, { WM_KEYUP, event_type::key_up },
+				{ WM_MOUSEMOVE, event_type::mouse_move },
+				{ WM_LBUTTONDOWN, event_type::mouse_lbutton_down },
+			});
 
-			int type = 0;
-			switch (msg.message)
-			{
-			case WM_QUIT:
-				type = EVENT_QUIT;
-				break;
-			case WM_KEYDOWN:
-				type = EVENT_KEYDOWN;
-				break;
-			case WM_LBUTTONDOWN:
-				type = EVENT_LBUTTONDOWN;
-				break;
-			case WM_MOUSEMOVE:
-				type = EVENT_MOUSEMOVE;
-				break;
-			}
-
-			return event(type, wnd, mouse_event(_mouse_event_from_msg(msg)), keyboard_event(_keyboard_event_from_msg(msg)));
+			return event(mapped_events.count(msg.message) ? mapped_events.at(msg.message) : event_type::invalid,
+				(window*)GetWindowLongPtrW(msg.hwnd, GWLP_USERDATA),
+				mouse_event(_mouse_event_from_msg(msg)), keyboard_event(_keyboard_event_from_msg(msg)));
 		}
 	}
 
@@ -68,6 +59,6 @@ namespace junior
 			if (e) return e;
 		}
 
-		return event(EVENT_QUIT);
+		return event(event_type::quit);
 	}
 }
