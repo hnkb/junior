@@ -10,8 +10,10 @@ namespace junior
 		invalid,
 		quit,
 		key_down, key_up,
-		mouse_move,
-		mouse_lbutton_down
+		mouse_move, mouse_wheel,
+		mouse_lbutton_down, mouse_lbutton_up,
+		mouse_rbutton_down, mouse_rbutton_up,
+		mouse_mbutton_down, mouse_mbutton_up,
 	};
 
 	struct mouse_event
@@ -31,6 +33,7 @@ namespace junior
 			bool control;
 			bool shift;
 		} is_button_pressed;
+		int wheel_delta;
 
 	private:
 		bool _valid;
