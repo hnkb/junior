@@ -1,6 +1,7 @@
 
 #include "junior-simple.h"
 #include <vector>
+#include <Windows.h>
 
 
 namespace junior
@@ -9,6 +10,7 @@ namespace junior
 
 	window& create_window(const wchar_t* title)
 	{
+		ShowWindow(GetConsoleWindow(), SW_HIDE);
 		windows.push_back(window(title));
 		return windows.back();
 	}
