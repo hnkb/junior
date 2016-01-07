@@ -22,11 +22,11 @@ namespace junior
 			HDC get_dc() const { return GetDC(_handle); }
 
 		private:
+			void _create_window(const wchar_t* title);
 			LRESULT _window_proc(const UINT msg, const WPARAM wParam, const WPARAM lParam);
 
 			window* _owner;
 			HWND _handle;
-
 			static int _window_count;
 		};
 	}
