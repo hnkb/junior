@@ -56,8 +56,8 @@ namespace junior
 	struct event
 	{
 	public:
-		event() : type(event_type::invalid) {}
-		event(const event_type event_type) : type(event_type) {}
+		event() : type(event_type::invalid), window(nullptr) {}
+		event(const event_type event_type) : type(event_type), window(nullptr) {}
 		event(const event_type event_type, window* event_window, const mouse_event& event_mouse, const keyboard_event& event_key)
 			: type(event_type), window(event_window), mouse(event_mouse), key(event_key) {}
 
@@ -65,7 +65,7 @@ namespace junior
 		inline bool operator==(const event_type val) const { return type == val; }
 
 		const event_type type;
-		window* window;
+		window* const window;
 		const mouse_event mouse;
 		const keyboard_event key;
 	};
