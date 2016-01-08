@@ -39,6 +39,9 @@
     <ClCompile Include="..\..\..\src\win32\window_engine.cpp">
       <Filter>Source Files\win32</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\win32\event_engine.cpp">
+      <Filter>Source Files\win32</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\include\junior-simple.h">
@@ -51,6 +54,9 @@
       <Filter>Header Files\core</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\win32\common-winsdk.h">
+      <Filter>Header Files\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\win32\event_engine.h">
       <Filter>Header Files\win32</Filter>
     </ClInclude>
   </ItemGroup>

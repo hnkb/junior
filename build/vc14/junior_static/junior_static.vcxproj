@@ -22,12 +22,14 @@
     <ClCompile Include="..\..\..\src\core\event.cpp" />
     <ClCompile Include="..\..\..\src\core\junior-simple.cpp" />
     <ClCompile Include="..\..\..\src\core\window.cpp" />
+    <ClCompile Include="..\..\..\src\win32\event_engine.cpp" />
     <ClCompile Include="..\..\..\src\win32\window_engine.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\include\junior.h" />
     <ClInclude Include="..\..\..\include\junior-simple.h" />
     <ClInclude Include="..\..\..\src\win32\common-winsdk.h" />
+    <ClInclude Include="..\..\..\src\win32\event_engine.h" />
     <ClInclude Include="..\..\..\src\win32\window_engine.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
