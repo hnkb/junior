@@ -63,7 +63,8 @@ namespace junior
 	public:
 		keyboard_event() : _valid(false) {}
 		keyboard_event(bool valid) : _valid(valid) {}
-		
+		inline operator bool() const { return _valid; }
+
 		int code;
 
 	private:

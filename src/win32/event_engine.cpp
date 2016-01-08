@@ -11,16 +11,19 @@ junior::mouse_event event_engine::_mouse_event_from_msg(const MSG& msg)
 {
 	mouse_event m(msg.message >= WM_MOUSEFIRST && msg.message <= WM_MOUSELAST);
 
-	m.x = GET_X_LPARAM(msg.lParam);
-	m.y = GET_Y_LPARAM(msg.lParam);
+	if (m)
+	{
+		m.x = GET_X_LPARAM(msg.lParam);
+		m.y = GET_Y_LPARAM(msg.lParam);
 
-	m.is_button_pressed.left = (msg.wParam & MK_LBUTTON) != 0;
-	m.is_button_pressed.middle = (msg.wParam & MK_MBUTTON) != 0;
-	m.is_button_pressed.right = (msg.wParam & MK_RBUTTON) != 0;
-	m.is_button_pressed.control = (msg.wParam & MK_CONTROL) != 0;
-	m.is_button_pressed.shift = (msg.wParam & MK_SHIFT) != 0;
+		m.is_button_pressed.left = (msg.wParam & MK_LBUTTON) != 0;
+		m.is_button_pressed.middle = (msg.wParam & MK_MBUTTON) != 0;
+		m.is_button_pressed.right = (msg.wParam & MK_RBUTTON) != 0;
+		m.is_button_pressed.control = (msg.wParam & MK_CONTROL) != 0;
+		m.is_button_pressed.shift = (msg.wParam & MK_SHIFT) != 0;
 
-	m.wheel_delta = GET_WHEEL_DELTA_WPARAM(msg.wParam);
+		m.wheel_delta = GET_WHEEL_DELTA_WPARAM(msg.wParam);
+	}
 
 	return m;
 }
@@ -28,7 +31,7 @@ junior::mouse_event event_engine::_mouse_event_from_msg(const MSG& msg)
 keyboard_event event_engine::_keyboard_event_from_msg(const MSG& msg)
 {
 	keyboard_event k(msg.message >= WM_KEYFIRST && msg.message <= WM_KEYLAST);
-	k.code = (int)msg.wParam;
+	if (k) k.code = (int)msg.wParam;
 	return k;
 }
 
