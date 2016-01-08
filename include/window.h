@@ -20,7 +20,5 @@ namespace junior
 
 	private:
 		void* _engine;
-
-		int _cursor_y = 10;
 	};
 }

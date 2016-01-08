@@ -77,3 +77,43 @@ window* window_engine::get_owner(const HWND hWnd)
 	auto target = (window_engine*)GetWindowLongPtrW(hWnd, GWLP_USERDATA);
 	return target ? target->_owner : nullptr;
 }
+
+
+void window_engine::clear(const UINT32 rgb)
+{
+	// TODO: implement clear()
+}
+
+void window_engine::draw_line(const float x1, const float y1, const float x2, const float y2, const UINT32 rgb, const float width)
+{
+	if (!_handle) return;
+	auto hdc = GetDC(_handle);
+	MoveToEx(hdc, x1, y1, nullptr);
+	LineTo(hdc, x2, y2);
+}
+
+void window_engine::draw_ellipse(const float x, const float y, const float rx, const float ry, const UINT32 rgb, const float width)
+{
+	if (!_handle) return;
+	auto hdc = GetDC(_handle);
+	Ellipse(hdc, x - rx, y - ry, x + rx, y + ry);
+}
+
+void window_engine::fill_ellipse(const float x, const float y, const float rx, const float ry, const UINT32 rgb)
+{
+	if (!_handle) return;
+	auto hdc = GetDC(_handle);
+	Ellipse(hdc, x - rx, y - ry, x + rx, y + ry);
+}
+
+void window_engine::write(const wchar_t* text, const float x, const float y, const UINT32 rgb)
+{
+	if (!_handle) return;
+	auto hdc = GetDC(_handle);
+	TextOutW(hdc, x, y, text, lstrlenW(text));
+}
+
+void window_engine::write(const wchar_t* text, const UINT32 rgb)
+{
+	write(text, 10, _cursor_y += 20, rgb);
+}

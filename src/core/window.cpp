@@ -51,27 +51,20 @@ window::~window()
 
 void window::draw_line(const int x1, const int y1, const int x2, const int y2)
 {
-	if (!_engine) return;
-	auto hdc = static_cast<window_engine*>(_engine)->get_dc();
-	MoveToEx(hdc, x1, y1, nullptr);
-	LineTo(hdc, x2, y2);
+	if (_engine) static_cast<window_engine*>(_engine)->draw_line(x1, y1, x2, y2, 0xdd5544, 3);
 }
 
 void window::draw_circle(const int x, const int y, const int radius)
 {
-	if (!_engine) return;
-	auto hdc = static_cast<window_engine*>(_engine)->get_dc();
-	Ellipse(hdc, x - radius, y - radius, x + radius, y + radius);
+	if (!_engine) static_cast<window_engine*>(_engine)->draw_ellipse(x, y, radius, radius, 0xdd5544, 3);
 }
 
 void window::write(const wchar_t* text, const int x, const int y)
 {
-	if (!_engine) return;
-	auto hdc = static_cast<window_engine*>(_engine)->get_dc();
-	TextOutW(hdc, x, y, text, lstrlenW(text));
+	if (!_engine) static_cast<window_engine*>(_engine)->write(text, x, y, 0xdd5544);
 }
 
 void window::write(const wchar_t* text)
 {
-	write(text, 10, _cursor_y += 20);
+	if (!_engine) static_cast<window_engine*>(_engine)->write(text, 0xdd5544);
 }
