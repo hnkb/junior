@@ -110,9 +110,9 @@ HRESULT window_engine::_create_device_independent_resources()
 
 	HRESULT hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &_d2d_factory);
 
-	if (SUCCEEDED(hr)) hr = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(_dwrite_factory), (IUnknown**)&_dwrite_factory);
+	if (SUCCEEDED(hr)) hr = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(_dwrite_factory), reinterpret_cast<IUnknown**>(&_dwrite_factory));
 	
-	if (SUCCEEDED(hr)) hr = _dwrite_factory->CreateTextFormat(L"Segoe UI", nullptr, DWRITE_FONT_WEIGHT_THIN, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 24.0f, L"en-us", &_text_format);
+	if (SUCCEEDED(hr)) hr = _dwrite_factory->CreateTextFormat(L"Segoe UI", nullptr, DWRITE_FONT_WEIGHT_THIN, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 24.0f, L"", &_text_format);
 
 	return hr;
 }
@@ -195,9 +195,8 @@ void window_engine::write(const wchar_t* text, const float x, const float y, con
 {
 	if (_render_target && _text_format)
 	{
-		RECT rc;
-		GetClientRect(_handle, &rc);
-		auto layout_rect = D2D1::RectF(x, y, rc.right, rc.bottom);
+		auto target_size = _render_target->GetSize();
+		auto layout_rect = D2D1::RectF(x, y, target_size.width - 10, target_size.height);
 
 		CComPtr<ID2D1SolidColorBrush> brush = nullptr;
 		_render_target->CreateSolidColorBrush(D2D1::ColorF(rgb), &brush);
