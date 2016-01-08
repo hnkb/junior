@@ -198,6 +198,8 @@ void window_engine::write(const wchar_t* text, const float x, const float y, con
 		auto target_size = _render_target->GetSize();
 		auto layout_rect = D2D1::RectF(x, y, target_size.width - 10, target_size.height);
 
+		_text_format->SetReadingDirection(DWRITE_READING_DIRECTION_LEFT_TO_RIGHT);
+
 		CComPtr<ID2D1SolidColorBrush> brush = nullptr;
 		_render_target->CreateSolidColorBrush(D2D1::ColorF(rgb), &brush);
 
@@ -215,6 +217,9 @@ void window_engine::write(const wchar_t* text, const UINT32 rgb)
 
 		CComPtr<ID2D1SolidColorBrush> brush = nullptr;
 		_render_target->CreateSolidColorBrush(D2D1::ColorF(rgb), &brush);
+
+		bool is_arabic = text[0] && ((text[0] >= 0x0600 && text[0] <= 0x06ff) || (text[0] >= 0x08a0 && text[0] <= 0x08ff) || (text[0] >= 0xfb50 && text[0] <= 0xfdff) || (text[0] >= 0xfe70 && text[0] <= 0xfeff));
+		_text_format->SetReadingDirection(is_arabic ? DWRITE_READING_DIRECTION_RIGHT_TO_LEFT : DWRITE_READING_DIRECTION_LEFT_TO_RIGHT);
 
 		CComPtr<IDWriteTextLayout> layout;
 		HRESULT hr = _dwrite_factory->CreateTextLayout(text, lstrlen(text), _text_format, target_size.width - 2 * margin, target_size.height - _cursor_y - margin, &layout);
