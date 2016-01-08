@@ -32,7 +32,9 @@ namespace junior
 			static int _window_count;
 
 			CComPtr<ID2D1HwndRenderTarget> _render_target;
+			CComPtr<IDWriteTextFormat> _text_format;
 			CComPtr<ID2D1Factory> _d2d_factory;
+			CComPtr<IDWriteFactory> _dwrite_factory;
 
 		public:
 			bool begin_draw();

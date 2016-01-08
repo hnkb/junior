@@ -9,7 +9,7 @@ int window_engine::_window_count = 0;
 
 
 window_engine::window_engine(window* owner, const wchar_t* title, const UINT32 background_color)
-	: _owner(owner), _d2d_factory(nullptr), _render_target(nullptr), _background_color(D2D1::ColorF(background_color))
+	: _owner(owner), _d2d_factory(nullptr), _dwrite_factory(nullptr), _render_target(nullptr), _text_format(nullptr), _background_color(D2D1::ColorF(background_color))
 {
 	_create_device_independent_resources();
 	_create_window(title);
@@ -108,7 +108,13 @@ HRESULT window_engine::_create_device_independent_resources()
 	if (CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED) == S_FALSE)
 		CoUninitialize();
 
-	return D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &_d2d_factory);
+	HRESULT hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &_d2d_factory);
+
+	if (SUCCEEDED(hr)) hr = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(_dwrite_factory), (IUnknown**)&_dwrite_factory);
+	
+	if (SUCCEEDED(hr)) hr = _dwrite_factory->CreateTextFormat(L"Segoe UI", nullptr, DWRITE_FONT_WEIGHT_THIN, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 24.0f, L"en-us", &_text_format);
+
+	return hr;
 }
 
 HRESULT window_engine::_create_device_resources()
@@ -187,14 +193,21 @@ void window_engine::fill_ellipse(const float x, const float y, const float rx, c
 
 void window_engine::write(const wchar_t* text, const float x, const float y, const UINT32 rgb)
 {
-	//if (!_handle) return;
-	//auto hdc = GetDC(_handle);
-	//TextOutW(hdc, x, y, text, lstrlenW(text));
+	if (_render_target && _text_format)
+	{
+		RECT rc;
+		GetClientRect(_handle, &rc);
+		auto layout_rect = D2D1::RectF(x, y, rc.right, rc.bottom);
 
-	fill_ellipse(x, y, 3, 3, rgb);
+		CComPtr<ID2D1SolidColorBrush> brush = nullptr;
+		_render_target->CreateSolidColorBrush(D2D1::ColorF(rgb), &brush);
+
+		_render_target->DrawTextW(text, lstrlen(text), _text_format, layout_rect, brush);
+	}
 }
 
 void window_engine::write(const wchar_t* text, const UINT32 rgb)
 {
-	write(text, 10, _cursor_y += 20, rgb);
+	write(text, 10, _cursor_y, rgb);
+	_cursor_y += 32;
 }
