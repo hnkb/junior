@@ -50,5 +50,8 @@
     <ClInclude Include="..\..\..\include\junior.h">
       <Filter>Header Files\core</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\src\win32\common-winsdk.h">
+      <Filter>Header Files\win32</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

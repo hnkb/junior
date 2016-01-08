@@ -27,6 +27,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\include\junior.h" />
     <ClInclude Include="..\..\..\include\junior-simple.h" />
+    <ClInclude Include="..\..\..\src\win32\common-winsdk.h" />
     <ClInclude Include="..\..\..\src\win32\window_engine.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

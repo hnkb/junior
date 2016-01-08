@@ -1,8 +1,6 @@
 
 #include "window_engine.h"
 
-#pragma comment(lib, "d2d1.lib")
-
 using namespace junior;
 using namespace junior::_win32;
 

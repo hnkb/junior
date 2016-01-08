@@ -2,9 +2,7 @@
 
 #include "junior.h"
 #include <string>
-#include <Windows.h>
-#include <atlbase.h>
-#include <d2d1.h>
+#include "common-winsdk.h"
 
 
 namespace junior

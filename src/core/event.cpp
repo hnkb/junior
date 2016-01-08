@@ -2,8 +2,7 @@
 #include "junior.h"
 #include "../win32/window_engine.h"
 #include <map>
-#include <Windows.h>
-#include <windowsx.h>
+#include "../win32/common-winsdk.h"
 
 
 namespace junior
