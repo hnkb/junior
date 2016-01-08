@@ -207,6 +207,25 @@ void window_engine::write(const wchar_t* text, const float x, const float y, con
 
 void window_engine::write(const wchar_t* text, const UINT32 rgb)
 {
-	write(text, 10, _cursor_y, rgb);
-	_cursor_y += 32;
+	static float margin = 10;
+
+	if (_render_target && _text_format)
+	{
+		auto target_size = _render_target->GetSize();
+
+		CComPtr<ID2D1SolidColorBrush> brush = nullptr;
+		_render_target->CreateSolidColorBrush(D2D1::ColorF(rgb), &brush);
+
+		CComPtr<IDWriteTextLayout> layout;
+		HRESULT hr = _dwrite_factory->CreateTextLayout(text, lstrlen(text), _text_format, target_size.width - 2 * margin, target_size.height - _cursor_y - margin, &layout);
+
+		if (SUCCEEDED(hr))
+		{
+			_render_target->DrawTextLayout(D2D1::Point2F(margin, _cursor_y), layout, brush);
+
+			DWRITE_TEXT_METRICS metrics;
+			layout->GetMetrics(&metrics);
+			_cursor_y += metrics.height;
+		}
+	}
 }
