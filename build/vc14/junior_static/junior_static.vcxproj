@@ -25,13 +25,9 @@
     <ClCompile Include="..\..\..\src\win32\window_engine.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\include\event.h" />
+    <ClInclude Include="..\..\..\include\junior.h" />
     <ClInclude Include="..\..\..\include\junior-simple.h" />
-    <ClInclude Include="..\..\..\include\window.h" />
     <ClInclude Include="..\..\..\src\win32\window_engine.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\..\include\junior" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{CAA10A71-B1E8-40CA-BC5E-095D51687510}</ProjectGuid>

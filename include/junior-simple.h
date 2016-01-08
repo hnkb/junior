@@ -1,7 +1,6 @@
 #pragma once
 
-#include "window.h"
-#include "event.h"
+#include "junior.h"
 
 
 namespace junior

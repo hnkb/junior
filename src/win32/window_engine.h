@@ -1,6 +1,6 @@
 #pragma once
 
-#include "window.h"
+#include "junior.h"
 #include <string>
 #include <Windows.h>
 #include <atlbase.h>

@@ -41,22 +41,14 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\include\event.h">
-      <Filter>Header Files\core</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\include\junior-simple.h">
-      <Filter>Header Files\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\window.h">
       <Filter>Header Files\core</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\win32\window_engine.h">
       <Filter>Header Files\win32</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\..\include\junior">
+    <ClInclude Include="..\..\..\include\junior.h">
       <Filter>Header Files\core</Filter>
-    </None>
+    </ClInclude>
   </ItemGroup>
 </Project>

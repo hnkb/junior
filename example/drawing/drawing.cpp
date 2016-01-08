@@ -1,5 +1,5 @@
 
-#include <junior>
+#include <junior.h>
 #include <Windows.h>
 
 
