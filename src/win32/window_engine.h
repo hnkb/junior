@@ -26,12 +26,15 @@ namespace junior
 			HRESULT _create_device_independent_resources();
 			HRESULT _create_device_resources();
 			void _discard_device_resources();
+			HRESULT _paint();
+			HRESULT _resize_back_buffer(D2D1_SIZE_F new_size);
 
 			window* _owner;
 			HWND _handle;
 			static int _window_count;
 
-			CComPtr<ID2D1HwndRenderTarget> _render_target;
+			CComPtr<ID2D1HwndRenderTarget> _hwnd_target;
+			CComPtr<ID2D1BitmapRenderTarget> _render_target;
 			CComPtr<IDWriteTextFormat> _text_format;
 			CComPtr<ID2D1Factory> _d2d_factory;
 			CComPtr<IDWriteFactory> _dwrite_factory;
