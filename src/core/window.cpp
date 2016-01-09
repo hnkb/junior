@@ -65,6 +65,14 @@ window& window::draw_circle(const int x, const int y, const int radius)
 	return *this;
 }
 
+window& window::fill_circle(const int x, const int y, const int radius)
+{
+	if (_engine) static_cast<window_engine*>(_engine)->begin_draw();
+	if (_engine) static_cast<window_engine*>(_engine)->fill_ellipse(x, y, radius, radius, 0xdd5544);
+	if (_engine) static_cast<window_engine*>(_engine)->end_draw();
+	return *this;
+}
+
 window& window::write(const wchar_t* text, const int x, const int y)
 {
 	if (_engine) static_cast<window_engine*>(_engine)->begin_draw();

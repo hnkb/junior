@@ -30,8 +30,18 @@ namespace junior
 		main_window().draw_circle(x, y, radius);
 	}
 
+	void fill_circle(const int x, const int y, const int radius)
+	{
+		main_window().fill_circle(x, y, radius);
+	}
+
 	void write(const wchar_t* text, const int x, const int y)
 	{
 		main_window().write(text, x, y);
+	}
+
+	void write(const wchar_t* text)
+	{
+		main_window().write(text);
 	}
 }

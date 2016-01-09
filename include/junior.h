@@ -15,6 +15,7 @@ namespace junior
 
 		window& draw_line(const int x1, const int y1, const int x2, const int y2);
 		window& draw_circle(const int x, const int y, const int radius);
+		window& fill_circle(const int x, const int y, const int radius);
 		window& write(const wchar_t* text, const int x, const int y);
 		window& write(const wchar_t* text);
 
