@@ -9,7 +9,7 @@ int window_engine::_window_count = 0;
 
 
 window_engine::window_engine(window* owner, const wchar_t* title, const UINT32 background_color)
-	: _owner(owner), _d2d_factory(nullptr), _dwrite_factory(nullptr), _hwnd_target(nullptr), _canvas(nullptr), _text_format(nullptr), _background_color(D2D1::ColorF(background_color))
+	: _owner(owner), _d2d_factory(nullptr), _dwrite_factory(nullptr), _hwnd_target(nullptr), _canvas_target(nullptr), _text_format(nullptr), _background_color(D2D1::ColorF(background_color))
 {
 	_create_device_independent_resources();
 	_create_window(title);
@@ -54,9 +54,9 @@ LRESULT window_engine::_window_proc(const UINT msg, const WPARAM wParam, const W
 	switch (msg)
 	{
 	case WM_SIZE:
-		if (_canvas)
+		if (_canvas_target)
 		{
-			auto buffer_size = _canvas->GetSize();
+			auto buffer_size = _canvas_target->GetSize();
 			if (buffer_size.width < LOWORD(lParam) || buffer_size.height < HIWORD(lParam))
 				_resize_canvas(D2D1::SizeF(max(buffer_size.width, LOWORD(lParam)), max(buffer_size.height, HIWORD(lParam))));
 		}
@@ -120,7 +120,7 @@ HRESULT window_engine::_create_device_independent_resources()
 
 HRESULT window_engine::_create_device_resources()
 {
-	if (_canvas) return S_FALSE;
+	if (_canvas_target) return S_FALSE;
 	if (!_handle || !_d2d_factory) return E_NOT_VALID_STATE;
 
 	RECT rc;
@@ -129,12 +129,12 @@ HRESULT window_engine::_create_device_resources()
 
 	HRESULT hr = _d2d_factory->CreateHwndRenderTarget(D2D1::RenderTargetProperties(), D2D1::HwndRenderTargetProperties(_handle, size), &_hwnd_target);
 
-	if (SUCCEEDED(hr)) hr = _hwnd_target->CreateCompatibleRenderTarget(&_canvas);
+	if (SUCCEEDED(hr)) hr = _hwnd_target->CreateCompatibleRenderTarget(&_canvas_target);
 	if (SUCCEEDED(hr))
 	{
-		_canvas->BeginDraw();
-		_canvas->Clear(_background_color);
-		hr = _canvas->EndDraw();
+		_canvas_target->BeginDraw();
+		_canvas_target->Clear(_background_color);
+		hr = _canvas_target->EndDraw();
 	}
 
 	return hr;
@@ -143,7 +143,7 @@ HRESULT window_engine::_create_device_resources()
 void window_engine::_discard_device_resources()
 {
 	_hwnd_target = nullptr;
-	_canvas = nullptr;
+	_canvas_target = nullptr;
 }
 
 HRESULT window_engine::_paint()
@@ -152,7 +152,7 @@ HRESULT window_engine::_paint()
 	if (FAILED(hr)) return E_NOT_VALID_STATE;
 
 	CComPtr<ID2D1Bitmap> bmp;
-	hr = _canvas->GetBitmap(&bmp);
+	hr = _canvas_target->GetBitmap(&bmp);
 	if (SUCCEEDED(hr))
 	{
 		auto size = bmp->GetSize();
@@ -174,24 +174,24 @@ HRESULT window_engine::_paint()
 
 HRESULT window_engine::_resize_canvas(D2D1_SIZE_F new_size)
 {
-	if (!_hwnd_target || !_canvas) return E_NOT_VALID_STATE;
+	if (!_hwnd_target || !_canvas_target) return E_NOT_VALID_STATE;
 
-	CComPtr<ID2D1BitmapRenderTarget> new_canvas;
-	HRESULT hr = _hwnd_target->CreateCompatibleRenderTarget(new_size, &new_canvas);
+	CComPtr<ID2D1BitmapRenderTarget> new_canvas_target;
+	HRESULT hr = _hwnd_target->CreateCompatibleRenderTarget(new_size, &new_canvas_target);
 	if (SUCCEEDED(hr))
 	{
-		new_canvas->BeginDraw();
-		new_canvas->Clear(_background_color);
-		hr = new_canvas->EndDraw();
+		new_canvas_target->BeginDraw();
+		new_canvas_target->Clear(_background_color);
+		hr = new_canvas_target->EndDraw();
 	}
 
 	CComPtr<ID2D1Bitmap> current_bmp;
 	CComPtr<ID2D1Bitmap> new_bmp;
-	if (SUCCEEDED(hr)) hr = _canvas->GetBitmap(&current_bmp);
-	if (SUCCEEDED(hr)) hr = new_canvas->GetBitmap(&new_bmp);
+	if (SUCCEEDED(hr)) hr = _canvas_target->GetBitmap(&current_bmp);
+	if (SUCCEEDED(hr)) hr = new_canvas_target->GetBitmap(&new_bmp);
 	if (SUCCEEDED(hr)) hr = new_bmp->CopyFromBitmap(nullptr, current_bmp, nullptr);
 
-	if (SUCCEEDED(hr)) _canvas = new_canvas;
+	if (SUCCEEDED(hr)) _canvas_target = new_canvas_target;
 
 	return hr;
 }
@@ -200,13 +200,13 @@ HRESULT window_engine::_resize_canvas(D2D1_SIZE_F new_size)
 bool window_engine::begin_draw()
 {
 	HRESULT hr = _create_device_resources();
-	if (SUCCEEDED(hr)) _canvas->BeginDraw();
+	if (SUCCEEDED(hr)) _canvas_target->BeginDraw();
 	return SUCCEEDED(hr);
 }
 
 bool window_engine::end_draw()
 {
-	HRESULT hr = _canvas->EndDraw();
+	HRESULT hr = _canvas_target->EndDraw();
 
 	if (hr == D2DERR_RECREATE_TARGET)
 	{
@@ -230,47 +230,47 @@ void window_engine::clear(const UINT32 rgb)
 
 void window_engine::draw_line(const float x1, const float y1, const float x2, const float y2, const UINT32 rgb, const float width)
 {
-	if (_canvas)
+	if (_canvas_target)
 	{
 		CComPtr<ID2D1SolidColorBrush> brush = nullptr;
-		_canvas->CreateSolidColorBrush(D2D1::ColorF(rgb), &brush);
-		_canvas->DrawLine(D2D1::Point2F(x1, y1), D2D1::Point2F(x2, y2), brush, width);
+		_canvas_target->CreateSolidColorBrush(D2D1::ColorF(rgb), &brush);
+		_canvas_target->DrawLine(D2D1::Point2F(x1, y1), D2D1::Point2F(x2, y2), brush, width);
 	}
 }
 
 void window_engine::draw_ellipse(const float x, const float y, const float rx, const float ry, const UINT32 rgb, const float width)
 {
-	if (_canvas)
+	if (_canvas_target)
 	{
 		CComPtr<ID2D1SolidColorBrush> brush = nullptr;
-		_canvas->CreateSolidColorBrush(D2D1::ColorF(rgb), &brush);
-		_canvas->DrawEllipse(D2D1::Ellipse(D2D1::Point2F(x, y), rx, ry), brush, width);
+		_canvas_target->CreateSolidColorBrush(D2D1::ColorF(rgb), &brush);
+		_canvas_target->DrawEllipse(D2D1::Ellipse(D2D1::Point2F(x, y), rx, ry), brush, width);
 	}
 }
 
 void window_engine::fill_ellipse(const float x, const float y, const float rx, const float ry, const UINT32 rgb)
 {
-	if (_canvas)
+	if (_canvas_target)
 	{
 		CComPtr<ID2D1SolidColorBrush> brush = nullptr;
-		_canvas->CreateSolidColorBrush(D2D1::ColorF(rgb), &brush);
-		_canvas->FillEllipse(D2D1::Ellipse(D2D1::Point2F(x, y), rx, ry), brush);
+		_canvas_target->CreateSolidColorBrush(D2D1::ColorF(rgb), &brush);
+		_canvas_target->FillEllipse(D2D1::Ellipse(D2D1::Point2F(x, y), rx, ry), brush);
 	}
 }
 
 void window_engine::write(const wchar_t* text, const float x, const float y, const UINT32 rgb)
 {
-	if (_canvas && _text_format)
+	if (_canvas_target && _text_format)
 	{
-		auto target_size = _canvas->GetSize();
+		auto target_size = _canvas_target->GetSize();
 		auto layout_rect = D2D1::RectF(x, y, target_size.width - 10, target_size.height);
 
 		_text_format->SetReadingDirection(DWRITE_READING_DIRECTION_LEFT_TO_RIGHT);
 
 		CComPtr<ID2D1SolidColorBrush> brush = nullptr;
-		_canvas->CreateSolidColorBrush(D2D1::ColorF(rgb), &brush);
+		_canvas_target->CreateSolidColorBrush(D2D1::ColorF(rgb), &brush);
 
-		_canvas->DrawTextW(text, lstrlen(text), _text_format, layout_rect, brush);
+		_canvas_target->DrawTextW(text, lstrlen(text), _text_format, layout_rect, brush);
 	}
 }
 
@@ -278,12 +278,12 @@ void window_engine::write(const wchar_t* text, const UINT32 rgb)
 {
 	static float margin = 10;
 
-	if (_canvas && _text_format)
+	if (_canvas_target && _text_format)
 	{
-		auto target_size = _canvas->GetSize();
+		auto target_size = _canvas_target->GetSize();
 
 		CComPtr<ID2D1SolidColorBrush> brush = nullptr;
-		_canvas->CreateSolidColorBrush(D2D1::ColorF(rgb), &brush);
+		_canvas_target->CreateSolidColorBrush(D2D1::ColorF(rgb), &brush);
 
 		bool is_arabic = text[0] && ((text[0] >= 0x0600 && text[0] <= 0x06ff) || (text[0] >= 0x08a0 && text[0] <= 0x08ff) || (text[0] >= 0xfb50 && text[0] <= 0xfdff) || (text[0] >= 0xfe70 && text[0] <= 0xfeff));
 		_text_format->SetReadingDirection(is_arabic ? DWRITE_READING_DIRECTION_RIGHT_TO_LEFT : DWRITE_READING_DIRECTION_LEFT_TO_RIGHT);
@@ -293,7 +293,7 @@ void window_engine::write(const wchar_t* text, const UINT32 rgb)
 
 		if (SUCCEEDED(hr))
 		{
-			_canvas->DrawTextLayout(D2D1::Point2F(margin, _cursor_y), layout, brush);
+			_canvas_target->DrawTextLayout(D2D1::Point2F(margin, _cursor_y), layout, brush);
 
 			DWRITE_TEXT_METRICS metrics;
 			layout->GetMetrics(&metrics);
