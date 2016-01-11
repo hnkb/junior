@@ -9,7 +9,7 @@ int window_engine::_window_count = 0;
 
 
 window_engine::window_engine(window* owner, const wchar_t* title, const UINT32 background_color)
-	: _owner(owner), _d2d_factory(nullptr), _dwrite_factory(nullptr), _hwnd_target(nullptr), _canvas_target(nullptr), _text_format(nullptr), _background_color(D2D1::ColorF(background_color))
+	: _owner(owner), _d2d_factory(nullptr), _dwrite_factory(nullptr), _screen_target(nullptr), _canvas_target(nullptr), _text_format(nullptr), _background_color(D2D1::ColorF(background_color))
 {
 	_create_device_independent_resources();
 	_create_window(title);
@@ -60,9 +60,9 @@ LRESULT window_engine::_window_proc(const UINT msg, const WPARAM wParam, const W
 			if (buffer_size.width < LOWORD(lParam) || buffer_size.height < HIWORD(lParam))
 				_resize_canvas(D2D1::SizeF(max(buffer_size.width, LOWORD(lParam)), max(buffer_size.height, HIWORD(lParam))));
 		}
-		if (_hwnd_target)
+		if (_screen_target)
 		{
-			_hwnd_target->Resize(D2D1::SizeU(LOWORD(lParam), HIWORD(lParam)));
+			_screen_target->Resize(D2D1::SizeU(LOWORD(lParam), HIWORD(lParam)));
 			InvalidateRect(_handle, nullptr, FALSE);
 		}
 		return 0;
@@ -127,9 +127,9 @@ HRESULT window_engine::_create_device_resources()
 	GetClientRect(_handle, &rc);
 	D2D1_SIZE_U size = D2D1::SizeU(rc.right - rc.left, rc.bottom - rc.top);
 
-	HRESULT hr = _d2d_factory->CreateHwndRenderTarget(D2D1::RenderTargetProperties(), D2D1::HwndRenderTargetProperties(_handle, size), &_hwnd_target);
+	HRESULT hr = _d2d_factory->CreateHwndRenderTarget(D2D1::RenderTargetProperties(), D2D1::HwndRenderTargetProperties(_handle, size), &_screen_target);
 
-	if (SUCCEEDED(hr)) hr = _hwnd_target->CreateCompatibleRenderTarget(&_canvas_target);
+	if (SUCCEEDED(hr)) hr = _screen_target->CreateCompatibleRenderTarget(&_canvas_target);
 	if (SUCCEEDED(hr))
 	{
 		_canvas_target->BeginDraw();
@@ -142,7 +142,7 @@ HRESULT window_engine::_create_device_resources()
 
 void window_engine::_discard_device_resources()
 {
-	_hwnd_target = nullptr;
+	_screen_target = nullptr;
 	_canvas_target = nullptr;
 }
 
@@ -158,9 +158,9 @@ HRESULT window_engine::_paint()
 		auto size = bmp->GetSize();
 		auto rect = D2D1::RectF(0, 0, size.width, size.height);
 
-		_hwnd_target->BeginDraw();
-		_hwnd_target->DrawBitmap(bmp, rect, 1, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR, rect);
-		hr = _hwnd_target->EndDraw();
+		_screen_target->BeginDraw();
+		_screen_target->DrawBitmap(bmp, rect, 1, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR, rect);
+		hr = _screen_target->EndDraw();
 	}
 
 	if (hr == D2DERR_RECREATE_TARGET)
@@ -174,10 +174,10 @@ HRESULT window_engine::_paint()
 
 HRESULT window_engine::_resize_canvas(D2D1_SIZE_F new_size)
 {
-	if (!_hwnd_target || !_canvas_target) return E_NOT_VALID_STATE;
+	if (!_screen_target || !_canvas_target) return E_NOT_VALID_STATE;
 
 	CComPtr<ID2D1BitmapRenderTarget> new_canvas_target;
-	HRESULT hr = _hwnd_target->CreateCompatibleRenderTarget(new_size, &new_canvas_target);
+	HRESULT hr = _screen_target->CreateCompatibleRenderTarget(new_size, &new_canvas_target);
 	if (SUCCEEDED(hr))
 	{
 		new_canvas_target->BeginDraw();

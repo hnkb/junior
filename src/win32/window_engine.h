@@ -33,7 +33,7 @@ namespace junior
 			HWND _handle;
 			static int _window_count;
 
-			CComPtr<ID2D1HwndRenderTarget> _hwnd_target;
+			CComPtr<ID2D1HwndRenderTarget> _screen_target;
 			CComPtr<ID2D1BitmapRenderTarget> _canvas_target;
 			CComPtr<IDWriteTextFormat> _text_format;
 			CComPtr<ID2D1Factory> _d2d_factory;
