@@ -26,7 +26,7 @@ namespace junior
 			HRESULT _create_device_independent_resources();
 			HRESULT _create_device_resources();
 			void _discard_device_resources();
-			HRESULT _paint();
+			HRESULT _update_screen();
 			HRESULT _resize_canvas(D2D1_SIZE_F new_size);
 
 			window* _owner;

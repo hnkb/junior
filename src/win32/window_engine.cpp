@@ -72,7 +72,7 @@ LRESULT window_engine::_window_proc(const UINT msg, const WPARAM wParam, const W
 		return 0;
 
 	case WM_PAINT:
-		if (SUCCEEDED(_paint()))
+		if (SUCCEEDED(_update_screen()))
 			ValidateRect(_handle, nullptr);
 		return 0;
 
@@ -146,20 +146,20 @@ void window_engine::_discard_device_resources()
 	_canvas_target = nullptr;
 }
 
-HRESULT window_engine::_paint()
+HRESULT window_engine::_update_screen()
 {
 	HRESULT hr = _create_device_resources();
 	if (FAILED(hr)) return E_NOT_VALID_STATE;
 
-	CComPtr<ID2D1Bitmap> bmp;
-	hr = _canvas_target->GetBitmap(&bmp);
+	CComPtr<ID2D1Bitmap> canvas;
+	hr = _canvas_target->GetBitmap(&canvas);
 	if (SUCCEEDED(hr))
 	{
-		auto size = bmp->GetSize();
+		auto size = canvas->GetSize();
 		auto rect = D2D1::RectF(0, 0, size.width, size.height);
 
 		_screen_target->BeginDraw();
-		_screen_target->DrawBitmap(bmp, rect, 1, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR, rect);
+		_screen_target->DrawBitmap(canvas, rect, 1, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR, rect);
 		hr = _screen_target->EndDraw();
 	}
 
@@ -176,22 +176,22 @@ HRESULT window_engine::_resize_canvas(D2D1_SIZE_F new_size)
 {
 	if (!_screen_target || !_canvas_target) return E_NOT_VALID_STATE;
 
-	CComPtr<ID2D1BitmapRenderTarget> new_canvas_target;
-	HRESULT hr = _screen_target->CreateCompatibleRenderTarget(new_size, &new_canvas_target);
+	CComPtr<ID2D1BitmapRenderTarget> new_target;
+	HRESULT hr = _screen_target->CreateCompatibleRenderTarget(new_size, &new_target);
 	if (SUCCEEDED(hr))
 	{
-		new_canvas_target->BeginDraw();
-		new_canvas_target->Clear(_background_color);
-		hr = new_canvas_target->EndDraw();
+		new_target->BeginDraw();
+		new_target->Clear(_background_color);
+		hr = new_target->EndDraw();
 	}
 
-	CComPtr<ID2D1Bitmap> current_bmp;
-	CComPtr<ID2D1Bitmap> new_bmp;
-	if (SUCCEEDED(hr)) hr = _canvas_target->GetBitmap(&current_bmp);
-	if (SUCCEEDED(hr)) hr = new_canvas_target->GetBitmap(&new_bmp);
-	if (SUCCEEDED(hr)) hr = new_bmp->CopyFromBitmap(nullptr, current_bmp, nullptr);
+	CComPtr<ID2D1Bitmap> current_canvas;
+	CComPtr<ID2D1Bitmap> new_canvas;
+	if (SUCCEEDED(hr)) hr = _canvas_target->GetBitmap(&current_canvas);
+	if (SUCCEEDED(hr)) hr = new_target->GetBitmap(&new_canvas);
+	if (SUCCEEDED(hr)) hr = new_canvas->CopyFromBitmap(nullptr, current_canvas, nullptr);
 
-	if (SUCCEEDED(hr)) _canvas_target = new_canvas_target;
+	if (SUCCEEDED(hr)) _canvas_target = new_target;
 
 	return hr;
 }
