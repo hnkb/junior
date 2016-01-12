@@ -13,6 +13,9 @@ namespace junior
 		window& operator=(window&& other);
 		~window();
 
+		window& begin_draw();
+		window& end_draw();
+
 		window& draw_line(const int x1, const int y1, const int x2, const int y2);
 		window& draw_circle(const int x, const int y, const int radius);
 		window& fill_circle(const int x, const int y, const int radius);

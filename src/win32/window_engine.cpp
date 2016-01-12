@@ -136,6 +136,8 @@ HRESULT window_engine::_create_device_resources()
 		hr = _canvas_target->EndDraw();
 	}
 
+	_queued_drawing = false;
+
 	return hr;
 }
 
@@ -143,6 +145,7 @@ void window_engine::_discard_device_resources()
 {
 	_screen_target = nullptr;
 	_canvas_target = nullptr;
+	_queued_drawing = false;
 }
 
 HRESULT window_engine::_update_screen()
@@ -206,13 +209,18 @@ HRESULT window_engine::_resize_canvas(D2D1_SIZE_F new_size)
 bool window_engine::begin_draw()
 {
 	HRESULT hr = _create_device_resources();
-	if (SUCCEEDED(hr)) _canvas_target->BeginDraw();
+	if (SUCCEEDED(hr))
+	{
+		_canvas_target->BeginDraw();
+		_queued_drawing = true;
+	}
 	return SUCCEEDED(hr);
 }
 
 bool window_engine::end_draw()
 {
-	if (!_canvas_target) return E_NOT_VALID_STATE;
+	if (!_canvas_target) return false;
+	// TODO: if (!_queued_drawing) warn user
 
 	HRESULT hr = _canvas_target->EndDraw();
 
@@ -227,6 +235,8 @@ bool window_engine::end_draw()
 		InvalidateRect(_handle, nullptr, FALSE);
 	}
 
+	_queued_drawing = false;
+
 	return SUCCEEDED(hr);
 }
 
@@ -238,74 +248,75 @@ void window_engine::clear(const UINT32 rgb)
 
 void window_engine::draw_line(const float x1, const float y1, const float x2, const float y2, const UINT32 rgb, const float width)
 {
-	if (_canvas_target)
-	{
+	_draw([&]() {
 		CComPtr<ID2D1SolidColorBrush> brush = nullptr;
 		_canvas_target->CreateSolidColorBrush(D2D1::ColorF(rgb), &brush);
 		_canvas_target->DrawLine(D2D1::Point2F(x1, y1), D2D1::Point2F(x2, y2), brush, width);
-	}
+	});
 }
 
 void window_engine::draw_ellipse(const float x, const float y, const float rx, const float ry, const UINT32 rgb, const float width)
 {
-	if (_canvas_target)
-	{
+	_draw([&]() {
 		CComPtr<ID2D1SolidColorBrush> brush = nullptr;
 		_canvas_target->CreateSolidColorBrush(D2D1::ColorF(rgb), &brush);
 		_canvas_target->DrawEllipse(D2D1::Ellipse(D2D1::Point2F(x, y), rx, ry), brush, width);
-	}
+	});
 }
 
 void window_engine::fill_ellipse(const float x, const float y, const float rx, const float ry, const UINT32 rgb)
 {
-	if (_canvas_target)
-	{
+	_draw([&]() {
 		CComPtr<ID2D1SolidColorBrush> brush = nullptr;
 		_canvas_target->CreateSolidColorBrush(D2D1::ColorF(rgb), &brush);
 		_canvas_target->FillEllipse(D2D1::Ellipse(D2D1::Point2F(x, y), rx, ry), brush);
-	}
+	});
 }
 
 void window_engine::write(const wchar_t* text, const float x, const float y, const UINT32 rgb)
 {
-	if (_canvas_target && _text_format)
-	{
-		auto target_size = _canvas_target->GetSize();
-		auto layout_rect = D2D1::RectF(x, y, target_size.width - 10, target_size.height);
+	_draw([&]() {
+		if (_text_format)
+		{
+			auto target_size = _canvas_target->GetSize();
+			auto layout_rect = D2D1::RectF(x, y, target_size.width - 10, target_size.height);
 
-		_text_format->SetReadingDirection(DWRITE_READING_DIRECTION_LEFT_TO_RIGHT);
+			_text_format->SetReadingDirection(DWRITE_READING_DIRECTION_LEFT_TO_RIGHT);
 
-		CComPtr<ID2D1SolidColorBrush> brush = nullptr;
-		_canvas_target->CreateSolidColorBrush(D2D1::ColorF(rgb), &brush);
+			CComPtr<ID2D1SolidColorBrush> brush = nullptr;
+			_canvas_target->CreateSolidColorBrush(D2D1::ColorF(rgb), &brush);
 
-		_canvas_target->DrawTextW(text, lstrlen(text), _text_format, layout_rect, brush);
-	}
+			_canvas_target->DrawTextW(text, lstrlen(text), _text_format, layout_rect, brush);
+		}
+	});
 }
 
 void window_engine::write(const wchar_t* text, const UINT32 rgb)
 {
 	static float margin = 10;
 
-	if (_canvas_target && _text_format)
-	{
-		auto target_size = _canvas_target->GetSize();
-
-		CComPtr<ID2D1SolidColorBrush> brush = nullptr;
-		_canvas_target->CreateSolidColorBrush(D2D1::ColorF(rgb), &brush);
-
-		bool is_arabic = text[0] && ((text[0] >= 0x0600 && text[0] <= 0x06ff) || (text[0] >= 0x08a0 && text[0] <= 0x08ff) || (text[0] >= 0xfb50 && text[0] <= 0xfdff) || (text[0] >= 0xfe70 && text[0] <= 0xfeff));
-		_text_format->SetReadingDirection(is_arabic ? DWRITE_READING_DIRECTION_RIGHT_TO_LEFT : DWRITE_READING_DIRECTION_LEFT_TO_RIGHT);
-
-		CComPtr<IDWriteTextLayout> layout;
-		HRESULT hr = _dwrite_factory->CreateTextLayout(text, lstrlen(text), _text_format, target_size.width - 2 * margin, target_size.height - _cursor_y - margin, &layout);
-
-		if (SUCCEEDED(hr))
+	_draw([&]() {
+		if (_text_format)
 		{
-			_canvas_target->DrawTextLayout(D2D1::Point2F(margin, _cursor_y), layout, brush);
+			auto target_size = _canvas_target->GetSize();
 
-			DWRITE_TEXT_METRICS metrics;
-			layout->GetMetrics(&metrics);
-			_cursor_y += metrics.height;
+			CComPtr<ID2D1SolidColorBrush> brush = nullptr;
+			_canvas_target->CreateSolidColorBrush(D2D1::ColorF(rgb), &brush);
+
+			bool is_arabic = text[0] && ((text[0] >= 0x0600 && text[0] <= 0x06ff) || (text[0] >= 0x08a0 && text[0] <= 0x08ff) || (text[0] >= 0xfb50 && text[0] <= 0xfdff) || (text[0] >= 0xfe70 && text[0] <= 0xfeff));
+			_text_format->SetReadingDirection(is_arabic ? DWRITE_READING_DIRECTION_RIGHT_TO_LEFT : DWRITE_READING_DIRECTION_LEFT_TO_RIGHT);
+
+			CComPtr<IDWriteTextLayout> layout;
+			HRESULT hr = _dwrite_factory->CreateTextLayout(text, lstrlen(text), _text_format, target_size.width - 2 * margin, target_size.height - _cursor_y - margin, &layout);
+
+			if (SUCCEEDED(hr))
+			{
+				_canvas_target->DrawTextLayout(D2D1::Point2F(margin, _cursor_y), layout, brush);
+
+				DWRITE_TEXT_METRICS metrics;
+				layout->GetMetrics(&metrics);
+				_cursor_y += metrics.height;
+			}
 		}
-	}
+	});
 }

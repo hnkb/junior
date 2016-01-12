@@ -55,6 +55,24 @@ namespace junior
 		private:
 			D2D1_COLOR_F _background_color;
 			float _cursor_y = 10;
+			bool _queued_drawing;
+
+
+			template<class Func> inline void _draw(Func func)
+			{
+				if (_queued_drawing)
+				{
+					if (_canvas_target) func();
+				}
+				else
+				{
+					if (begin_draw())
+					{
+						func();
+						end_draw();
+					}
+				}
+			}
 		};
 	}
 }
