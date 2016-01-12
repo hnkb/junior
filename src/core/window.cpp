@@ -64,25 +64,25 @@ window& window::end_draw()
 
 window& window::draw_line(const int x1, const int y1, const int x2, const int y2)
 {
-	if (_engine) static_cast<window_engine*>(_engine)->draw_line(x1, y1, x2, y2, 0xdd5544, 3);
+	if (_engine) static_cast<window_engine*>(_engine)->draw_line((float)x1, (float)y1, (float)x2, (float)y2, 0xdd5544, 3);
 	return *this;
 }
 
 window& window::draw_circle(const int x, const int y, const int radius)
 {
-	if (_engine) static_cast<window_engine*>(_engine)->draw_ellipse(x, y, radius, radius, 0xdd5544, 3);
+	if (_engine) static_cast<window_engine*>(_engine)->draw_ellipse((float)x, (float)y, (float)radius, (float)radius, 0xdd5544, 3);
 	return *this;
 }
 
 window& window::fill_circle(const int x, const int y, const int radius)
 {
-	if (_engine) static_cast<window_engine*>(_engine)->fill_ellipse(x, y, radius, radius, 0xdd5544);
+	if (_engine) static_cast<window_engine*>(_engine)->fill_ellipse((float)x, (float)y, (float)radius, (float)radius, 0xdd5544);
 	return *this;
 }
 
 window& window::write(const wchar_t* text, const int x, const int y)
 {
-	if (_engine) static_cast<window_engine*>(_engine)->write(text, x, y, 0xdd5544);
+	if (_engine) static_cast<window_engine*>(_engine)->write(text, (float)x, (float)y, 0xdd5544);
 	return *this;
 }
 
