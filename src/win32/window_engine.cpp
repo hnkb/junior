@@ -72,8 +72,7 @@ LRESULT window_engine::_window_proc(const UINT msg, const WPARAM wParam, const W
 		return 0;
 
 	case WM_PAINT:
-		if (SUCCEEDED(_update_screen()))
-			ValidateRect(_handle, nullptr);
+		_update_screen();
 		return 0;
 
 	case WM_DESTROY:
@@ -151,16 +150,23 @@ HRESULT window_engine::_update_screen()
 	HRESULT hr = _create_device_resources();
 	if (FAILED(hr)) return E_NOT_VALID_STATE;
 
+	RECT rc;
+	GetUpdateRect(_handle, &rc, FALSE);
+
 	CComPtr<ID2D1Bitmap> canvas;
 	hr = _canvas_target->GetBitmap(&canvas);
 	if (SUCCEEDED(hr))
 	{
-		auto size = canvas->GetSize();
-		auto rect = D2D1::RectF(0, 0, size.width, size.height);
+		auto rect = D2D1::RectF((float)rc.left, (float)rc.top, (float)rc.right, (float)rc.bottom);
 
 		_screen_target->BeginDraw();
 		_screen_target->DrawBitmap(canvas, rect, 1, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR, rect);
 		hr = _screen_target->EndDraw();
+	}
+
+	if (SUCCEEDED(hr))
+	{
+		ValidateRect(_handle, &rc);
 	}
 
 	if (hr == D2DERR_RECREATE_TARGET)
