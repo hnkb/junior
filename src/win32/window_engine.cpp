@@ -185,6 +185,9 @@ HRESULT window_engine::_resize_canvas(D2D1_SIZE_F new_size)
 {
 	if (!_screen_target || !_canvas_target) return E_NOT_VALID_STATE;
 
+	bool middle_of_queue = _queued_drawing;
+	if (middle_of_queue) end_draw();
+
 	CComPtr<ID2D1BitmapRenderTarget> new_target;
 	HRESULT hr = _screen_target->CreateCompatibleRenderTarget(new_size, &new_target);
 	if (SUCCEEDED(hr))
@@ -200,7 +203,12 @@ HRESULT window_engine::_resize_canvas(D2D1_SIZE_F new_size)
 	if (SUCCEEDED(hr)) hr = new_target->GetBitmap(&new_canvas);
 	if (SUCCEEDED(hr)) hr = new_canvas->CopyFromBitmap(nullptr, current_canvas, nullptr);
 
-	if (SUCCEEDED(hr)) _canvas_target = new_target;
+	if (SUCCEEDED(hr))
+	{
+		_canvas_target = new_target;
+
+		if (middle_of_queue) hr = begin_draw() ? S_OK : E_FAIL;
+	}
 
 	return hr;
 }
@@ -208,6 +216,8 @@ HRESULT window_engine::_resize_canvas(D2D1_SIZE_F new_size)
 
 bool window_engine::begin_draw()
 {
+	if (_queued_drawing) return false; // TODO: warn user about begin/end draw mismatch
+
 	HRESULT hr = _create_device_resources();
 	if (SUCCEEDED(hr))
 	{
@@ -220,7 +230,7 @@ bool window_engine::begin_draw()
 bool window_engine::end_draw()
 {
 	if (!_canvas_target) return false;
-	// TODO: if (!_queued_drawing) warn user
+	if (!_queued_drawing) return false; // TODO: warn user about begin/end draw mismatch
 
 	HRESULT hr = _canvas_target->EndDraw();
 
