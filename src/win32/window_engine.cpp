@@ -212,6 +212,8 @@ bool window_engine::begin_draw()
 
 bool window_engine::end_draw()
 {
+	if (!_canvas_target) return E_NOT_VALID_STATE;
+
 	HRESULT hr = _canvas_target->EndDraw();
 
 	if (hr == D2DERR_RECREATE_TARGET)
