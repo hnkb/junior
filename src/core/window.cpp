@@ -64,8 +64,14 @@ window& window::end_draw()
 
 window& window::draw_line(const int x1, const int y1, const int x2, const int y2)
 {
-	if (_engine) static_cast<window_engine*>(_engine)->draw_line((float)x1, (float)y1, (float)x2, (float)y2, 0xdd5544, 3);
+	if (_engine) static_cast<window_engine*>(_engine)->draw_line((float)x1, (float)y1, (float)x2, (float)y2, _last_color, 3);
 	return *this;
+}
+
+window& window::draw_line(const int x1, const int y1, const int x2, const int y2, unsigned int color)
+{
+	_last_color = color;
+	return draw_line(x1, y1, x2, y2);
 }
 
 window& window::draw_circle(const int x, const int y, const int radius)
