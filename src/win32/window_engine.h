@@ -35,6 +35,7 @@ namespace junior
 
 			CComPtr<ID2D1HwndRenderTarget> _screen_target;
 			CComPtr<ID2D1BitmapRenderTarget> _canvas_target;
+			CComPtr<ID2D1SolidColorBrush> _default_brush;
 			CComPtr<IDWriteTextFormat> _text_format;
 			CComPtr<ID2D1Factory> _d2d_factory;
 			CComPtr<IDWriteFactory> _dwrite_factory;
@@ -53,6 +54,8 @@ namespace junior
 			void write(const wchar_t* text, const UINT32 rgb);
 
 		private:
+			CComPtr<ID2D1SolidColorBrush> _get_brush(const UINT32 rgb);
+
 			D2D1_COLOR_F _background_color;
 			float _cursor_y = 10;
 			bool _queued_drawing;

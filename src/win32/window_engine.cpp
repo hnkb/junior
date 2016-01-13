@@ -9,7 +9,7 @@ int window_engine::_window_count = 0;
 
 
 window_engine::window_engine(window* owner, const wchar_t* title, const UINT32 background_color)
-	: _owner(owner), _d2d_factory(nullptr), _dwrite_factory(nullptr), _screen_target(nullptr), _canvas_target(nullptr), _text_format(nullptr), _background_color(D2D1::ColorF(background_color))
+	: _owner(owner), _d2d_factory(nullptr), _dwrite_factory(nullptr), _screen_target(nullptr), _canvas_target(nullptr), _text_format(nullptr), _default_brush(nullptr), _background_color(D2D1::ColorF(background_color))
 {
 	_create_device_independent_resources();
 	_create_window(title);
@@ -136,6 +136,7 @@ HRESULT window_engine::_create_device_resources()
 		hr = _canvas_target->EndDraw();
 	}
 
+	if (SUCCEEDED(hr)) hr = _canvas_target->CreateSolidColorBrush(D2D1::ColorF(0), &_default_brush);
 	_queued_drawing = false;
 
 	return hr;
@@ -145,6 +146,7 @@ void window_engine::_discard_device_resources()
 {
 	_screen_target = nullptr;
 	_canvas_target = nullptr;
+	_default_brush = nullptr;
 	_queued_drawing = false;
 }
 
@@ -214,6 +216,14 @@ HRESULT window_engine::_resize_canvas(D2D1_SIZE_F new_size)
 }
 
 
+CComPtr<ID2D1SolidColorBrush> window_engine::_get_brush(const UINT32 rgb)
+{
+	if (!_default_brush) return nullptr;
+
+	_default_brush->SetColor(D2D1::ColorF(rgb, 1.f));
+	return _default_brush;
+}
+
 bool window_engine::begin_draw()
 {
 	if (_queued_drawing) return false; // TODO: warn user about begin/end draw mismatch
@@ -259,27 +269,21 @@ void window_engine::clear(const UINT32 rgb)
 void window_engine::draw_line(const float x1, const float y1, const float x2, const float y2, const UINT32 rgb, const float width)
 {
 	_draw([&]() {
-		CComPtr<ID2D1SolidColorBrush> brush = nullptr;
-		_canvas_target->CreateSolidColorBrush(D2D1::ColorF(rgb), &brush);
-		_canvas_target->DrawLine(D2D1::Point2F(x1, y1), D2D1::Point2F(x2, y2), brush, width);
+		_canvas_target->DrawLine(D2D1::Point2F(x1, y1), D2D1::Point2F(x2, y2), _get_brush(rgb), width);
 	});
 }
 
 void window_engine::draw_ellipse(const float x, const float y, const float rx, const float ry, const UINT32 rgb, const float width)
 {
 	_draw([&]() {
-		CComPtr<ID2D1SolidColorBrush> brush = nullptr;
-		_canvas_target->CreateSolidColorBrush(D2D1::ColorF(rgb), &brush);
-		_canvas_target->DrawEllipse(D2D1::Ellipse(D2D1::Point2F(x, y), rx, ry), brush, width);
+		_canvas_target->DrawEllipse(D2D1::Ellipse(D2D1::Point2F(x, y), rx, ry), _get_brush(rgb), width);
 	});
 }
 
 void window_engine::fill_ellipse(const float x, const float y, const float rx, const float ry, const UINT32 rgb)
 {
 	_draw([&]() {
-		CComPtr<ID2D1SolidColorBrush> brush = nullptr;
-		_canvas_target->CreateSolidColorBrush(D2D1::ColorF(rgb), &brush);
-		_canvas_target->FillEllipse(D2D1::Ellipse(D2D1::Point2F(x, y), rx, ry), brush);
+		_canvas_target->FillEllipse(D2D1::Ellipse(D2D1::Point2F(x, y), rx, ry), _get_brush(rgb));
 	});
 }
 
@@ -293,10 +297,7 @@ void window_engine::write(const wchar_t* text, const float x, const float y, con
 
 			_text_format->SetReadingDirection(DWRITE_READING_DIRECTION_LEFT_TO_RIGHT);
 
-			CComPtr<ID2D1SolidColorBrush> brush = nullptr;
-			_canvas_target->CreateSolidColorBrush(D2D1::ColorF(rgb), &brush);
-
-			_canvas_target->DrawTextW(text, lstrlen(text), _text_format, layout_rect, brush);
+			_canvas_target->DrawTextW(text, lstrlen(text), _text_format, layout_rect, _get_brush(rgb));
 		}
 	});
 }
@@ -310,9 +311,6 @@ void window_engine::write(const wchar_t* text, const UINT32 rgb)
 		{
 			auto target_size = _canvas_target->GetSize();
 
-			CComPtr<ID2D1SolidColorBrush> brush = nullptr;
-			_canvas_target->CreateSolidColorBrush(D2D1::ColorF(rgb), &brush);
-
 			bool is_arabic = text[0] && ((text[0] >= 0x0600 && text[0] <= 0x06ff) || (text[0] >= 0x08a0 && text[0] <= 0x08ff) || (text[0] >= 0xfb50 && text[0] <= 0xfdff) || (text[0] >= 0xfe70 && text[0] <= 0xfeff));
 			_text_format->SetReadingDirection(is_arabic ? DWRITE_READING_DIRECTION_RIGHT_TO_LEFT : DWRITE_READING_DIRECTION_LEFT_TO_RIGHT);
 
@@ -321,7 +319,7 @@ void window_engine::write(const wchar_t* text, const UINT32 rgb)
 
 			if (SUCCEEDED(hr))
 			{
-				_canvas_target->DrawTextLayout(D2D1::Point2F(margin, _cursor_y), layout, brush);
+				_canvas_target->DrawTextLayout(D2D1::Point2F(margin, _cursor_y), layout, _get_brush(rgb));
 
 				DWRITE_TEXT_METRICS metrics;
 				layout->GetMetrics(&metrics);
