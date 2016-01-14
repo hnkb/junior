@@ -54,14 +54,9 @@ LRESULT window_engine::_window_proc(const UINT msg, const WPARAM wParam, const W
 	switch (msg)
 	{
 	case WM_SIZE:
-		if (_canvas_target)
-		{
-			auto buffer_size = _canvas_target->GetSize();
-			if (buffer_size.width < LOWORD(lParam) || buffer_size.height < HIWORD(lParam))
-				_resize_canvas(D2D1::SizeF(max(buffer_size.width, LOWORD(lParam)), max(buffer_size.height, HIWORD(lParam))));
-		}
 		if (_screen_target)
 		{
+			_resize_canvas(D2D1::SizeF((float)LOWORD(lParam), (float)HIWORD(lParam)));
 			_screen_target->Resize(D2D1::SizeU(LOWORD(lParam), HIWORD(lParam)));
 			InvalidateRect(_handle, nullptr, FALSE);
 		}
@@ -183,9 +178,13 @@ HRESULT window_engine::_update_screen()
 	return hr;
 }
 
-HRESULT window_engine::_resize_canvas(D2D1_SIZE_F new_size)
+HRESULT window_engine::_resize_canvas(D2D1_SIZE_F screen_size)
 {
 	if (!_screen_target || !_canvas_target) return E_NOT_VALID_STATE;
+
+	auto canvas_size = _canvas_target->GetSize();
+	if (canvas_size.width >= screen_size.width && canvas_size.height >= screen_size.height) return S_FALSE;
+	auto new_size = D2D1::SizeF(max(canvas_size.width, screen_size.width), max(canvas_size.height, screen_size.height));
 
 	bool middle_of_queue = _queued_drawing;
 	if (middle_of_queue) end_draw();
