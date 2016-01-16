@@ -9,7 +9,8 @@ int window_engine::_window_count = 0;
 
 
 window_engine::window_engine(window* owner, const wchar_t* title, const UINT32 background_color)
-	: _owner(owner), _d2d_factory(nullptr), _dwrite_factory(nullptr), _screen_target(nullptr), _canvas_target(nullptr), _text_format(nullptr), _default_brush(nullptr), _background_color(D2D1::ColorF(background_color))
+	: _owner(owner), _d2d_factory(nullptr), _dwrite_factory(nullptr), _screen_target(nullptr), _canvas_target(nullptr), _text_format(nullptr), _default_brush(nullptr),
+	  _background_color(D2D1::ColorF(background_color)), _text(), _text_margin(20)
 {
 	_create_device_independent_resources();
 	_create_window(title);
@@ -159,8 +160,34 @@ HRESULT window_engine::_update_screen()
 	{
 		auto rect = D2D1::RectF((float)rc.left, (float)rc.top, (float)rc.right, (float)rc.bottom);
 
+
+		CComPtr<IDWriteTextLayout> layout;
+
+		if (_text_format && _text.length())
+		{
+			auto screen_size = _screen_target->GetSize();
+
+			bool is_arabic = _text[0] && ((_text[0] >= 0x0600 && _text[0] <= 0x06ff) || (_text[0] >= 0x08a0 && _text[0] <= 0x08ff) || (_text[0] >= 0xfb50 && _text[0] <= 0xfdff) || (_text[0] >= 0xfe70 && _text[0] <= 0xfeff));
+			_text_format->SetReadingDirection(is_arabic ? DWRITE_READING_DIRECTION_RIGHT_TO_LEFT : DWRITE_READING_DIRECTION_LEFT_TO_RIGHT);
+
+			if (SUCCEEDED(_dwrite_factory->CreateTextLayout(_text.c_str(), (UINT32)_text.length(), _text_format, screen_size.width - 2 * _text_margin, screen_size.height - 2 * _text_margin, &layout)))
+			{
+				//DWRITE_TEXT_METRICS metrics;
+				//layout->GetMetrics(&metrics);
+				//if (metrics.height > (screen_size.height - 2 * margin)) MessageBox(_handle, L"Scrollbars needed!", 0, 0);
+
+				// TODO: here, we must merge output of GetUpdateRect() with rect around layout of each paragraph that needs re-drawing,
+				//       because DrawTextLayout() doesn't allow drawing only a portion of layout (instead of whole-layout)
+				// For now, invalidate the whole screen when we need to draw text.
+				rect = D2D1::RectF(0, 0, screen_size.width, screen_size.height);
+			}
+		}
+
+
 		_screen_target->BeginDraw();
+		//_screen_target->FillRectangle(rect, _get_brush(_background_color)); // TODO: clear background, not needed when canvas is guaranteed to be opaque
 		_screen_target->DrawBitmap(canvas, rect, 1, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR, rect);
+		if (layout) _screen_target->DrawTextLayout(D2D1::Point2F(_text_margin, _text_margin), layout, _get_brush(0x404040));
 		hr = _screen_target->EndDraw();
 	}
 
@@ -174,7 +201,7 @@ HRESULT window_engine::_update_screen()
 		_discard_device_resources();
 		hr = S_OK;
 	}
-	
+
 	return hr;
 }
 
@@ -215,12 +242,17 @@ HRESULT window_engine::_resize_canvas(D2D1_SIZE_F screen_size)
 }
 
 
-CComPtr<ID2D1SolidColorBrush> window_engine::_get_brush(const UINT32 rgb)
+CComPtr<ID2D1SolidColorBrush> window_engine::_get_brush(const D2D1_COLOR_F& color)
 {
 	if (!_default_brush) return nullptr;
 
-	_default_brush->SetColor(D2D1::ColorF(rgb, 1.f));
+	_default_brush->SetColor(color);
 	return _default_brush;
+}
+
+CComPtr<ID2D1SolidColorBrush> window_engine::_get_brush(const UINT32 rgb)
+{
+	return _get_brush(D2D1::ColorF(rgb, 1.f));
 }
 
 bool window_engine::begin_draw()
@@ -303,27 +335,7 @@ void window_engine::write(const wchar_t* text, const float x, const float y, con
 
 void window_engine::write(const wchar_t* text, const UINT32 rgb)
 {
-	static float margin = 10;
-
-	_draw([&]() {
-		if (_text_format)
-		{
-			auto target_size = _canvas_target->GetSize();
-
-			bool is_arabic = text[0] && ((text[0] >= 0x0600 && text[0] <= 0x06ff) || (text[0] >= 0x08a0 && text[0] <= 0x08ff) || (text[0] >= 0xfb50 && text[0] <= 0xfdff) || (text[0] >= 0xfe70 && text[0] <= 0xfeff));
-			_text_format->SetReadingDirection(is_arabic ? DWRITE_READING_DIRECTION_RIGHT_TO_LEFT : DWRITE_READING_DIRECTION_LEFT_TO_RIGHT);
-
-			CComPtr<IDWriteTextLayout> layout;
-			HRESULT hr = _dwrite_factory->CreateTextLayout(text, lstrlen(text), _text_format, target_size.width - 2 * margin, target_size.height - _cursor_y - margin, &layout);
-
-			if (SUCCEEDED(hr))
-			{
-				_canvas_target->DrawTextLayout(D2D1::Point2F(margin, _cursor_y), layout, _get_brush(rgb));
-
-				DWRITE_TEXT_METRICS metrics;
-				layout->GetMetrics(&metrics);
-				_cursor_y += metrics.height;
-			}
-		}
-	});
+	_text.append(text);
+	InvalidateRect(_handle, nullptr, FALSE);
+	// TODO: only invalidate portion around changed or added paragraphs
 }

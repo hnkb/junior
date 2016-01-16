@@ -54,11 +54,13 @@ namespace junior
 			void write(const wchar_t* text, const UINT32 rgb);
 
 		private:
+			CComPtr<ID2D1SolidColorBrush> _get_brush(const D2D1_COLOR_F& color);
 			CComPtr<ID2D1SolidColorBrush> _get_brush(const UINT32 rgb);
 
 			D2D1_COLOR_F _background_color;
-			float _cursor_y = 10;
 			bool _queued_drawing;
+			std::wstring _text;
+			float _text_margin;
 
 
 			template<class Func> inline void _draw(Func func)
