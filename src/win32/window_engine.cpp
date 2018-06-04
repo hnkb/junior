@@ -25,7 +25,7 @@ window_engine::~window_engine()
 void window_engine::_create_window(const wchar_t* title)
 {
 	WNDCLASSEXW wcex = { 0 };
-	wcex.cbSize = sizeof(WNDCLASSEX);
+	wcex.cbSize = sizeof(WNDCLASSEXW);
 	wcex.hInstance = GetModuleHandleW(nullptr);
 	wcex.hCursor = LoadCursorW(nullptr, IDC_ARROW);
 	wcex.lpszClassName = L"junior_window";
@@ -38,7 +38,7 @@ void window_engine::_create_window(const wchar_t* title)
 	RegisterClassExW(&wcex);
 
 	_handle = CreateWindowExW(0, wcex.lpszClassName, title, WS_OVERLAPPEDWINDOW,
-		CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, GetModuleHandleW(nullptr), nullptr);
+		CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, wcex.hInstance, nullptr);
 
 	if (_handle)
 	{
@@ -82,6 +82,7 @@ LRESULT window_engine::_window_proc(const UINT msg, const WPARAM wParam, const W
 
 std::wstring window_engine::get_title() const
 {
+	// TODO: use vector and GetWindowTextLength
 	wchar_t buffer[1024];
 	GetWindowTextW(_handle, buffer, 1024);
 	return std::wstring(buffer);

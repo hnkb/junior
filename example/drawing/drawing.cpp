@@ -24,7 +24,7 @@ int __stdcall wWinMain(HINSTANCE, HINSTANCE, LPWSTR, int)
 
 		if (e == junior::event_type::mouse_move && e.mouse.is_button_pressed.left && px != -1)
 		{
-			e.window->draw_line(px, py, e.mouse.x, e.mouse.y);
+			e.window->draw_line(px, py, e.mouse.x, e.mouse.y, 0x99ff);
 			px = e.mouse.x;
 			py = e.mouse.y;
 		}
