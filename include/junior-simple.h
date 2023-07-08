@@ -5,12 +5,12 @@
 
 namespace junior
 {
-	window& create_window(const wchar_t* title);
+	window& create_window(const char* title);
 	void draw_line(const int x1, const int y1, const int x2, const int y2);
 	void draw_circle(const int x, const int y, const int radius);
 	void fill_circle(const int x, const int y, const int radius);
-	void write(const wchar_t* text, const int x, const int y);
-	void write(const wchar_t* text);
+	void write(const char* text, const int x, const int y);
+	void write(const char* text);
 }
 
 using junior::wait_for_event;

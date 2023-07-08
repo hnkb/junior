@@ -8,11 +8,11 @@ int main()
 {
 	// Create a new window and display it on screen.
 	// The name of our window (displayed in title-bar) will be "Junior example".
-	create_window(L"Junior example");
+	create_window("Junior example");
 
 	// Write something to the window created in previous line.
 	// Use '\n' in your string literals to create a new line of text (a new paragraph).
-	write(L"Hello world!\nI'm using junior to talk to you :)");
+	write("Hello world!\nI'm using junior to talk to you :)");
 
 	// Draw a circle in our window.
 	// The first two parameters are X and Y coordinates of the center, the last parameter is the radius.

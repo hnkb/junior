@@ -5,7 +5,7 @@
 
 int main()
 {
-	junior::window main(L"Junior Drawing");
+	junior::window main("Junior Drawing");
 
 	int px = -1, py = -1;
 

@@ -8,7 +8,7 @@ namespace junior
 {
 	std::vector<window> windows;
 
-	window& create_window(const wchar_t* title)
+	window& create_window(const char* title)
 	{
 		ShowWindow(GetConsoleWindow(), SW_HIDE);
 		windows.push_back(window(title));
@@ -35,12 +35,12 @@ namespace junior
 		main_window().fill_circle(x, y, radius);
 	}
 
-	void write(const wchar_t* text, const int x, const int y)
+	void write(const char* text, const int x, const int y)
 	{
 		main_window().write(text, x, y);
 	}
 
-	void write(const wchar_t* text)
+	void write(const char* text)
 	{
 		main_window().write(text);
 	}

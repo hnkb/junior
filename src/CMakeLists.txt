@@ -16,6 +16,10 @@ target_sources (junior PRIVATE
 	"win32/window_engine.cpp"
 )
 
+if (MSVC)
+	target_compile_options (junior PUBLIC /utf-8)
+endif()
+
 
 set_target_properties (junior
 	PROPERTIES
