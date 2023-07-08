@@ -5,7 +5,7 @@ An easy to use, yet powerful GUI library, designed especially for starting C/C++
 *Do away with `<stdio.h>` and `std::cout`, teach young ones to create games and process images!*
 
 **This library is under development and is not ready for use yet. Documentation will be prepared after**
-**the API is fixed. For now, to get a general idea about this library, take a look at [`example`](https://github.com/labandierra/junior/blob/master/example) directory.**
+**the API is fixed. For now, to get a general idea about this library, take a look at [`examples`](https://github.com/labandierra/junior/blob/master/examples) directory.**
 
 The current implementation works on Windows 7 and up, uses Direct2D for high-performance graphics, supports
 Unicode and markdown for text, and allows saving and loading different types of images. A recent version of
@@ -17,7 +17,7 @@ Microsoft Visual C++ with decent C++11 support (Visual C++ 2012 and newer) is re
   like graphical games and image processing! The basic functions (like showing a window, drawing and
   printing text) shall work with the least amount of code and be understood by beginners with limited
   programming knowledge (take a look at
-  [`example\simple\simple.cpp`](https://github.com/labandierra/junior/blob/master/example/simple/simple.cpp))
+  [`examples\simple\simple.cpp`](https://github.com/labandierra/junior/blob/master/examples/simple/simple.cpp))
 - Each line of code shall have an immediate utility for the programmer (so no `init()` or `uninit()`!).
   Do not involve programmer as much as possible, instead, use sensible default behaviour.
 - Use standard C++ objects and conventions as much as possible. Favour modern C++. Never repeat things already
