@@ -45,7 +45,7 @@ namespace junior
 			bool end_draw();
 
 			void clear(const UINT32 rgb);
-			
+
 			void draw_line(const float x1, const float y1, const float x2, const float y2, const UINT32 rgb, const float width);
 			void draw_ellipse(const float x, const float y, const float rx, const float ry, const UINT32 rgb, const float width);
 			void fill_ellipse(const float x, const float y, const float rx, const float ry, const UINT32 rgb);

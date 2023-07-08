@@ -1,4 +1,4 @@
-﻿
+
 #include <junior.h>
 #include <Windows.h>
 
@@ -28,6 +28,6 @@ int __stdcall wWinMain(HINSTANCE, HINSTANCE, LPWSTR, int)
 				a.write(L"\nwindow 2 closed!\n\n");
 		}
 	}
-	
+
 	return 0;
 }

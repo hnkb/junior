@@ -108,7 +108,7 @@ HRESULT window_engine::_create_device_independent_resources()
 	HRESULT hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &_d2d_factory);
 
 	if (SUCCEEDED(hr)) hr = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(_dwrite_factory), reinterpret_cast<IUnknown**>(&_dwrite_factory));
-	
+
 	if (SUCCEEDED(hr)) hr = _dwrite_factory->CreateTextFormat(L"Segoe UI", nullptr, DWRITE_FONT_WEIGHT_THIN, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 24.0f, L"", &_text_format);
 
 	return hr;
