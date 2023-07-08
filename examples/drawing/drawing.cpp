@@ -3,7 +3,7 @@
 #include <Windows.h>
 
 
-int __stdcall wWinMain(HINSTANCE, HINSTANCE, LPWSTR, int)
+int main()
 {
 	junior::window main(L"Junior Drawing");
 

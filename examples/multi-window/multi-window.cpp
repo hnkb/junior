@@ -5,7 +5,7 @@
 using namespace junior;
 
 
-int __stdcall wWinMain(HINSTANCE, HINSTANCE, LPWSTR, int)
+int main()
 {
 	window a(L"window 1"), b(L"window 2");
 	window c = a;
